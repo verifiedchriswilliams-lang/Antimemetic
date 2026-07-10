@@ -577,6 +577,13 @@
                         await sleep(900);
                         await typeLine('ADDENDUM: it is not a sphere.', 'amber', 40);
                         putLine('');
+                        await sleep(900);
+                        await typeLine('personnel attempting to improve this description', 'dim', 30);
+                        await typeLine('have not demonstrated measurable success.', 'dim', 30);
+                        await sleep(700);
+                        await typeLine('additional documentation has been discontinued', 'dim', 30);
+                        await typeLine('pending measurable progress.', 'dim', 30);
+                        putLine('');
                         await sleep(1400);
                         await typeLine('have you forgotten something?', 'dim', 25);
                 },
@@ -587,6 +594,18 @@
                         await typeLine('ITEM #: U-2200', 'green', 80);
                         await typeLine('CLASS: PASSIVE / COOPERATIVE', 'green', 80);
                         await typeLine('LOCATION: PASSIVE CONTAINMENT ARCHIVE, UO WYELEIGH', 'green', 80);
+                        putLine('');
+                        await typeLine('SPECIAL CONTAINMENT PROCEDURES: personnel assigned', 'white', 55);
+                        await typeLine('to U-2200 for more than three consecutive interviews', 'white', 55);
+                        await typeLine('should rotate assignments for no less than thirty', 'white', 55);
+                        await typeLine('days.', 'white', 55);
+                        putLine('');
+                        await typeLine('hospitality offered by U-2200 is not covered under', 'white', 55);
+                        await typeLine('employee wellness benefits.', 'white', 55);
+                        putLine('');
+                        await typeLine('personnel are reminded that accepting recreational', 'white', 55);
+                        await typeLine('drug referrals from Unknowns requires Level 3', 'white', 55);
+                        await typeLine('approval.', 'white', 55);
                         putLine('');
                         await typeLine('DESCRIPTION: U-2200 is a non-corporeal telepathic', 'white', 55);
                         await typeLine('entity residing in a stone monolith. It identifies', 'white', 55);
@@ -715,6 +734,10 @@
                         await typeLine('DESCRIPTION: [REDACTED AT THE REQUEST OF THE', 'white', 55);
                         await typeLine('DIVISION CHIEF]', 'white', 55);
                         putLine('');
+                        await typeLine('ADMINISTRATIVE NOTE: quarterly inventory has been', 'white', 55);
+                        await typeLine('discontinued. the previous inventory remains', 'white', 55);
+                        await typeLine('accurate.', 'white', 55);
+                        putLine('');
                         await sleep(1400);
                         await typeLine('it holds what she cannot afford to carry.', 'dim', 28);
                         await sleep(900);
@@ -732,6 +755,10 @@
                         await typeLine('antimemetic predator. Instances present as unremarkable', 'white', 55);
                         await typeLine('personnel. No security pass. No employment record.', 'white', 55);
                         await typeLine('Nobody remembers hiring them. Nobody looks twice.', 'white', 55);
+                        putLine('');
+                        await typeLine('PROCEDURES: two-person investigative teams remain', 'white', 55);
+                        await typeLine('mandatory. this policy exists for reasons unrelated', 'white', 55);
+                        await typeLine('to personnel safety.', 'white', 55);
                         putLine('');
                         await typeLine('An instance isolates its target from the perception', 'white', 55);
                         await typeLine('of others, then consumes memory, identity, and', 'white', 55);
@@ -762,6 +789,11 @@
                         await typeLine('Reason for confiscation: unknown.', 'white', 55);
                         putLine('');
                         await typeLine('It works.', 'white', 45);
+                        putLine('');
+                        await typeLine('OPERATIONAL NOTE: do not point U-7381 at equipment', 'white', 45);
+                        await typeLine('requiring replacement.', 'white', 45);
+                        await typeLine('maintenance requests resulting from failure to', 'white', 45);
+                        await typeLine('observe this policy will not be expedited.', 'white', 45);
                         putLine('');
                         await sleep(1200);
                         await typeLine('NOTE: checked out by M. QUINN.', 'amber', 40);
@@ -796,6 +828,12 @@
                         await typeLine('someone has to remember.', 'dim', 25);
                         await sleep(700);
                         await typeLine('today it is you.', 'dim', 25);
+                        putLine('');
+                        await sleep(1300);
+                        await typeLine('VISITOR LOG', 'dim', 30);
+                        await typeLine('today: 1', 'dim', 30);
+                        await sleep(1600);
+                        await typeLine('thank you.', 'dim', 22);
                 },
 
                 'quinn': async () => {
@@ -999,9 +1037,11 @@
                         await sleep(1100);
                         await typeLine('DISPLAYING READABLE REPORTS (1):', 'dim', 30);
                         putLine('');
-                        await typeLine('  IR-0034: nothing happened.', 'white', 40);
-                        await typeLine('  everyone agrees nothing happened.', 'white', 40);
-                        await typeLine('  report filed anyway. filer unknown.', 'white', 40);
+                        await typeLine('  IR-0034', 'white', 40);
+                        putLine('');
+                        await typeLine('  SUMMARY: no incident occurred.', 'white', 40);
+                        await typeLine('  REASON REPORT FILED: required.', 'white', 40);
+                        await typeLine('  DISPOSITION: closed.', 'white', 40);
                 },
                 'incidents': async () => handlers['incident'](),
 
@@ -1056,6 +1096,9 @@
                         await typeLine('         do not envy them.', 'white', 50);
                         await typeLine('LEVEL 4: [record exceeds your clearance]', 'amber', 50);
                         await typeLine('LEVEL 5: there is no level 5.', 'white', 50);
+                        await sleep(800);
+                        await typeLine('personnel requesting clarification should resubmit', 'dim', 45);
+                        await typeLine('the request at the appropriate clearance level.', 'dim', 45);
                 },
 
                 'orientation': async () => {
@@ -1071,7 +1114,9 @@
                         await typeLine((rnd() < 0.04 ? 'PAGE 6' : 'PAGE 5') + ': welcome aboard. again.', 'white', 50);
                         putLine('');
                         await sleep(1300);
-                        await typeLine('we do not discuss page 4.', 'dim', 25);
+                        await typeLine('page 4 intentionally omitted.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('do not request a replacement.', 'dim', 25);
                 },
 
                 'directory': async () => {
@@ -1122,11 +1167,9 @@
                 'status': async () => {
                         await typeLine('ARCHIVE STATUS', 'green', 60);
                         putLine('');
-                        await typeLine('  files indexed ........... [MISMATCH]', 'white', 50);
-                        await typeLine('  files present ........... fewer', 'white', 50);
-                        await typeLine('  information decay ....... ONGOING', 'white', 50);
-                        await typeLine('  containment ............. HOLDING', 'white', 50);
                         await typeLine('  division ................ NO SUCH DIVISION', 'amber', 50);
+                        await typeLine('  files indexed ........... MISMATCH', 'white', 50);
+                        await typeLine('  information decay ....... ONGOING', 'white', 50);
                         putLine('');
                         await typeLine('  queries this session .... ' + queriesThisSession, 'white', 50);
                         await typeLine('  queries recorded ........ 0', 'white', 50);
@@ -1212,12 +1255,38 @@
                         newPromptLine();
                 },
 
+                'qntm': async () => {
+                        await header('ANOMALY ASSESSMENT');
+                        await typeLine('CLASSIFICATION: NARRATIVE CONTAMINATION', 'green', 60);
+                        await typeLine('CONTAINMENT STATUS: IMPOSSIBLE', 'red', 60);
+                        putLine('');
+                        await sleep(1000);
+                        await typeLine('RECOMMENDATION: read the reports.', 'white', 40);
+                        putLine('');
+                        await sleep(1200);
+                        await typeLine('do not trust the storyteller.', 'dim', 25);
+                },
+
+                'sam hughes': async () => {
+                        await sleep(900);
+                        await typeLine('no personnel by that name.', 'dim', 25);
+                        await sleep(1400);
+                        await typeLine('...documentation suggests otherwise.', 'dim', 22);
+                },
+                'samhughes': async () => handlers['sam hughes'](),
+
                 'credits': async () => {
-                        await typeLine('an unofficial fan work inspired by', 'dim', 40);
-                        await typeLine('THERE IS NO ANTIMEMETICS DIVISION by qntm (Sam Hughes).', 'dim', 40);
+                        await typeLine('unofficial archival reconstruction.', 'dim', 40);
+                        await typeLine('inspired by THERE IS NO ANTIMEMETICS DIVISION', 'dim', 40);
+                        await typeLine('by qntm (Sam Hughes).', 'dim', 40);
                         await typeLine('concepts originating on the SCP Foundation wiki are', 'dim', 40);
                         await typeLine('CC BY-SA 3.0, as is this page.', 'dim', 40);
-                        await typeLine('read the book. while you still remember it exists.', 'dim', 40);
+                        putLine('');
+                        await sleep(900);
+                        await typeLine('if these records have encouraged you to spend more', 'dim', 35);
+                        await typeLine('time in this universe...', 'dim', 35);
+                        await sleep(1200);
+                        await typeLine('read the book.', 'dim', 30);
                 },
           };
 
