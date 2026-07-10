@@ -12,6 +12,9 @@
     (scp-wiki.wikidot.com) are licensed CC BY-SA 3.0; this page is a
     derivative work and is likewise shared under CC BY-SA 3.0.
     Type "credits" at the terminal. Read the book.
+  
+    If you are reading this source code: yes, the archive really does drift.
+    No, this comment does not list how. That would defeat the purpose.
   -->
   <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -82,14 +85,50 @@
     </style>
   </head>
   <body>
-    <div id="crt"></div>
-    <div id="screen"></div>
-
     <script>
       (() => {
-          const screen = document.getElementById('screen');
+          // ---------- testable indirection ----------
+          const rnd = () => Math.random();
+          const nowMs = () => Date.now();
+          const localNow = () => new Date();
+
+          // ---------- DOM ----------
+          const crt = document.createElement('div');
+          crt.id = 'crt';
+          document.body.appendChild(crt);
+          const screen = document.createElement('div');
+          screen.id = 'screen';
+          document.body.appendChild(screen);
+
           const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+          // ---------- persistence (fails silently in private modes) ----------
+          function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+          function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+          // ---------- drift flags (rolled once per visit, in fixed order) ----------
+          const drift = {
+                flickerConnect: rnd() < (1 / 15),
+                mandelaVerified: rnd() < (1 / 40),
+                typo: rnd() < (1 / 50),
+                hesitate: rnd() < 0.005,
+                favicon: rnd() < 0.2,
+                memoryReadout: rnd() < (1 / 6),
+                helloName: rnd() < 0.25,
+          };
+          const hesitateAtKey = 2 + Math.floor(rnd() * 7);
+
+          // ---------- favicon drift ----------
+          if (drift.favicon) {
+                const link = document.createElement('link');
+                link.rel = 'icon';
+                link.href = 'data:image/svg+xml,' + encodeURIComponent(
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">' +
+                        '<rect x="7" y="7" width="2" height="2" fill="#33ff66"/></svg>');
+                document.head.appendChild(link);
+          }
+
+          // ---------- output primitives ----------
           let cursorEl = null;
 
           function makeCursor() {
@@ -130,6 +169,28 @@
                 skipTyping = false;
           }
 
+          // ---------- monthly aging ----------
+          function monthIndex() {
+                const d = localNow();
+                return d.getFullYear() * 12 + d.getMonth();
+          }
+          const whisperPool = [
+                'you were about to type something. what was it?',
+                'the cursor is not blinking for you.',
+                'someone else was here a minute ago.',
+                'it is quieter in here than it used to be. you noticed.',
+                'you can stop waiting. it already happened.',
+                'type the number. you still remember it. for now.',
+              ];
+          const idleWhisperMsg = whisperPool[monthIndex() % whisperPool.length];
+
+          const o55MonthlyLine = [
+                'No one knows why we have it. No one remembers',
+                'No one remembers acquiring it. No one remembers',
+                'No one is sure we still have it. No one remembers',
+              ][monthIndex() % 3];
+
+          // ---------- boot ----------
           const bootLines = [
                 ['UO SECURE TERMINAL v4.7.1', '', 120],
                 ['UNKNOWN ORGANISATION. WE KEEP WHAT CANNOT BE KEPT.', '', 40],
@@ -153,16 +214,61 @@
                 ['ERROR: NO SUCH DIVISION.', 'err', 600],
               ];
 
+          function buildBootLines() {
+                let lines = bootLines.map(l => l.slice());
+
+                if (drift.mandelaVerified || lsGet('uo_verified')) {
+                        lines = lines.map(l =>
+                                  l[0] === 'MNESTIC CLEARANCE ............. UNVERIFIED'
+                                                    ? ['MNESTIC CLEARANCE ............. VERIFIED', '', 300]
+                                    : l);
+                }
+
+                if (drift.typo) {
+                        const typos = [
+                                  ['COGNITOHAZARD FILTER .......... ACTIVE',
+                                            'COGNITOHAZARD FILTER .......... ACTVE'],
+                                  ['MEMORY TEST : 65536 KB OK',
+                                            'MEMORY TSET : 65536 KB OK'],
+                                ];
+                        const t = typos[Math.floor(rnd() * typos.length)];
+                        lines = lines.map(l => l[0] === t[0] ? [t[1], l[1], l[2]] : l);
+                }
+                return lines;
+          }
+
           let bootSkipped = false;
           function skipBoot() { bootSkipped = true; skipTyping = true; }
 
           async function boot() {
                 document.addEventListener('keydown', skipBoot, { once: true });
                 document.addEventListener('click', skipBoot, { once: true });
+
                 const wrap = document.createElement('span');
                 wrap.className = 'boot';
                 screen.appendChild(wrap);
-                for (const [text, cls, pause] of bootLines) {
+
+                const r94 = lsGet('uo_read9429_at');
+                if (r94 && !lsGet('uo_welcomed') &&
+                            nowMs() - Number(r94) >= 7 * 86400000) {
+                        lsSet('uo_welcomed', '1');
+                        wrap.appendChild(span('Welcome back.\n', 'warn'));
+                        scrollBottom();
+                        if (!bootSkipped) await sleep(1200);
+                        wrap.appendChild(span('Someone remembered.\n\n', 'warn'));
+                        scrollBottom();
+                        if (!bootSkipped) await sleep(1800);
+                }
+
+                const lines = buildBootLines();
+                for (const [text, cls, pause] of lines) {
+                        if (text.indexOf('ERROR:') === 0 && drift.flickerConnect && !bootSkipped) {
+                                  const c = span('CONNECTED.\n', '');
+                                  wrap.appendChild(c);
+                                  scrollBottom();
+                                  await sleep(500);
+                                  c.remove();
+                        }
                         const s = span(text + '\n', cls);
                         wrap.appendChild(s);
                         scrollBottom();
@@ -173,9 +279,21 @@
                 document.removeEventListener('click', skipBoot);
                 clearScreen();
                 await sleep(600);
+
+                const lf = lsGet('uo_lastfile');
+                const lfa = lsGet('uo_lastfile_at');
+                if (lf && lfa && drift.memoryReadout) {
+                        const days = Math.max(1, Math.floor((nowMs() - Number(lfa)) / 86400000));
+                        await typeLine('last verified memory: ' + lf, 'dim', 30);
+                        await typeLine('retention: ' + days + (days === 1 ? ' day' : ' days'), 'dim', 30);
+                        putLine('');
+                        await sleep(900);
+                }
+
                 startTerminal();
           }
 
+          // ---------- terminal ----------
           let inputSpan = null;
           let buffer = '';
           let accepting = false;
@@ -183,6 +301,8 @@
           let failedAttempts = 0;
           let idleTimer = null;
           let idleFired = false;
+          let keyCount = 0;
+          let inputMode = null;
 
           function newPromptLine() {
                 inputSpan = span('', 'white');
@@ -213,8 +333,9 @@
                 removePrompt();
                 const s = span('', 'dim');
                 screen.appendChild(s);
-                const msg = 'you were about to type something. what was it?';
-                for (const ch of msg) { s.textContent += ch; scrollBottom(); await sleep(55); }
+                for (const ch of idleWhisperMsg) {
+                        s.textContent += ch; scrollBottom(); await sleep(55);
+                }
                 await sleep(2600);
                 while (s.textContent.length) {
                         s.textContent = s.textContent.slice(0, -1);
@@ -230,9 +351,37 @@
                 document.addEventListener('keydown', onKey);
           }
 
+          function acceptChar(ch) {
+                if (buffer.length < 60) {
+                        buffer += ch;
+                        inputSpan.textContent = buffer;
+                }
+                scrollBottom();
+          }
+
           function onKey(e) {
                 if (!accepting || busy) return;
                 resetIdle();
+
+                if (inputMode === 'yn4512') {
+                        if (e.key.length === 1) {
+                                  const k = e.key.toLowerCase();
+                                  if (k === 'y' || k === 'n') {
+                                              e.preventDefault();
+                                              inputMode = null;
+                                              removePrompt();
+                                              busy = true;
+                                              putLine(k.toUpperCase(), 'white');
+                                              fragmentContinue(k === 'y').then(() => {
+                                                            busy = false;
+                                                            putLine('');
+                                                            newPromptLine();
+                                              });
+                                  }
+                        }
+                        return;
+                }
+
                 if (e.key === 'Enter') {
                         e.preventDefault();
                         submit();
@@ -242,11 +391,13 @@
                         inputSpan.textContent = buffer;
                 } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
                         e.preventDefault();
-                        if (buffer.length < 60) {
-                                  buffer += e.key;
-                                  inputSpan.textContent = buffer;
+                        keyCount++;
+                        if (drift.hesitate && keyCount === hesitateAtKey) {
+                                  const ch = e.key;
+                                  setTimeout(() => { if (accepting && !busy) acceptChar(ch); }, 200);
+                        } else {
+                                  acceptChar(e.key);
                         }
-                        scrollBottom();
                 }
           }
 
@@ -254,6 +405,22 @@
                 const raw = buffer.trim();
                 removePrompt();
                 busy = true;
+
+                if (inputMode === 'b30idea') {
+                        inputMode = null;
+                        await b30ReceiveIdea(raw);
+                        busy = false;
+                        if (!accepting) { newPromptLine(); }
+                        return;
+                }
+                if (inputMode === 'b30name') {
+                        inputMode = null;
+                        await b30ReceiveName(raw);
+                        busy = false;
+                        if (!accepting) { putLine(''); newPromptLine(); }
+                        return;
+                }
+
                 const cmd = normalize(raw);
 
                 if (!raw) {
@@ -268,8 +435,8 @@
           }
 
           function normalize(s) {
-                let c = s.toLowerCase().trim();
-                c = c.replace(/^(scp|u)[-\s]*/, '');
+                let c = s.toLowerCase().trim().replace(/\s+/g, ' ');
+                c = c.replace(/^(scp|u)[-\s]*(?=\d)/, '');
                 if (/^\d+$/.test(c)) c = String(parseInt(c, 10));
                 return c;
           }
@@ -290,15 +457,89 @@
                 }
           }
 
+          async function noSuchRecord() {
+                await sleep(700);
+                await typeLine('NO SUCH RECORD.', 'dim', 30);
+          }
+
           async function header(item) {
                 await typeLine('ACCESSING ' + item + ' ...', 'dim', 60);
                 await sleep(500);
                 putLine('');
           }
 
+          function markFile(name) {
+                lsSet('uo_lastfile', name);
+                lsSet('uo_lastfile_at', String(nowMs()));
+          }
+
+          // ---------- U-4512 recovered fragment ----------
+          async function fragmentContinue(yes) {
+                putLine('');
+                if (!yes) {
+                        await sleep(900);
+                        await typeLine('understood.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('it prefers it that way.', 'dim', 25);
+                        return;
+                }
+                await sleep(800);
+                await typeLine('█████ ██ ███ DESCRIPTION: ██████████ the ceiling of', 'white', 55);
+                await typeLine('██████████ █████████ all seventeen ███████', 'white', 55);
+                await typeLine('simultaneously ██████ ███ ████████████', 'white', 55);
+                putLine('');
+                await typeLine('  "they were singing" ████████████ █████', 'white', 55);
+                putLine('');
+                await typeLine('  INTERVIEWER: and then?', 'white', 55);
+                await typeLine('  SUBJECT: [no response]', 'white', 55);
+                putLine('');
+                await typeLine('█████████████ never recovered ██████', 'white', 55);
+                putLine('');
+                await sleep(1200);
+                await typeLine('REMAINING 97%: NOT RECOVERED.', 'amber', 40);
+                await sleep(700);
+                await typeLine('NOT RECOVERABLE.', 'amber', 40);
+                await sleep(700);
+                await typeLine('NOT [DATA LOST]', 'amber', 40);
+          }
+
+          // ---------- Vault B30-000 ----------
+          async function b30ReceiveIdea(raw) {
+                const idea = (raw || '').slice(0, 200);
+                lsSet('uo_b30_idea', idea || '(nothing)');
+                putLine('');
+                await sleep(700);
+                if (!idea) {
+                        await typeLine('that is also an idea.', 'dim', 25);
+                }
+                await typeLine('received.', 'dim', 25);
+                await sleep(900);
+                await typeLine('and who should it remember?', 'dim', 25);
+                putLine('');
+                inputMode = 'b30name';
+                newPromptLine();
+          }
+
+          async function b30ReceiveName(raw) {
+                let name = (raw || '').trim().split(/\s+/)[0].replace(/[^a-zA-Z'-]/g, '');
+                if (name.length >= 2 && name.length <= 20) {
+                        name = name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+                        lsSet('uo_b30_name', name);
+                }
+                putLine('');
+                await sleep(700);
+                await typeLine('thank you.', 'dim', 25);
+                await sleep(700);
+                await typeLine('he says he is close.', 'dim', 25);
+                await sleep(900);
+                await typeLine('forget you were here.', 'dim', 25);
+          }
+
+          // ---------- handlers ----------
           const handlers = {
 
                 '55': async () => {
+                        markFile('U-0055');
                         await header('FILE U-0055');
                         await typeLine('ITEM #: U-0055', 'green', 80);
                         await typeLine('CLASS: [UNKNOWN]', 'green', 80);
@@ -319,8 +560,11 @@
                         putLine('');
                         await typeLine('    - U-0055 is not spherical.', 'white', 55);
                         await typeLine('    - U-0055 is not round.', 'white', 55);
+                        if (lsGet('uo_read3125')) {
+                                  await typeLine('    - U-0055 is not the only one.', 'white', 55);
+                        }
                         putLine('');
-                        await typeLine('No one knows why we have it. No one remembers', 'white', 55);
+                        await typeLine(o55MonthlyLine, 'white', 55);
                         await typeLine('what it is. No action can be taken.', 'white', 55);
                         putLine('');
                         await sleep(900);
@@ -331,6 +575,7 @@
                 },
 
                 '2200': async () => {
+                        markFile('U-2200');
                         await header('FILE U-2200');
                         await typeLine('ITEM #: U-2200', 'green', 80);
                         await typeLine('CLASS: PASSIVE / COOPERATIVE', 'green', 80);
@@ -356,6 +601,9 @@
                 },
 
                 '2256': async () => {
+                        const day = localNow().getDay();
+                        if (day === 0 || day === 3) { await noSuchRecord(); return; }
+                        markFile('U-2256');
                         await header('FILE U-2256');
                         const lines = [];
                         lines.push(await typeLine('ITEM #: U-2256', 'green', 80));
@@ -392,6 +640,13 @@
                 },
 
                 '3125': async () => {
+                        if (lsGet('uo_read3125')) {
+                                  await sleep(900);
+                                  await typeLine('You already know this one.', 'white', 40);
+                                  await sleep(700);
+                                  await typeLine('Try remembering something else.', 'dim', 30);
+                                  return;
+                        }
                         if (!sessionStorage.getItem('override3125')) {
                                   sessionStorage.setItem('override3125', '1');
                                   await typeLine('FILE U-3125 IS RESTRICTED.', 'amber', 50);
@@ -400,6 +655,7 @@
                                   await typeLine('enter the number again to override. this is not recommended.', 'dim', 30);
                                   return;
                         }
+                        markFile('U-3125');
                         await header('FILE U-3125 - OVERRIDE ACCEPTED');
                         await typeLine('ITEM #: U-3125', 'green', 80);
                         await typeLine('CLASS: CATEGORY EPSILON', 'red', 80);
@@ -421,6 +677,7 @@
                         g.classList.add('glitch');
                         await sleep(1800);
                         clearScreen();
+                        lsSet('uo_read3125', '1');
                         await sleep(2500);
                         sessionStorage.removeItem('override3125');
                         await typeLine('what were you reading?', 'dim', 22);
@@ -428,7 +685,19 @@
                         newPromptLine();
                 },
 
+                '4512': async () => {
+                        markFile('U-4512');
+                        await sleep(800);
+                        await typeLine('RECOVERED FRAGMENT - U-4512', 'green', 60);
+                        await typeLine('RECOVERY: 3%', 'amber', 60);
+                        putLine('');
+                        await typeLine('CONTINUE? Y/N', 'white', 40);
+                        inputMode = 'yn4512';
+                        newPromptLine();
+                },
+
                 '4987': async () => {
+                        markFile('U-4987');
                         await header('FILE U-4987');
                         await typeLine('ITEM #: U-4987', 'green', 80);
                         await typeLine('CLASS: [RESTRICTED - DIVISION CHIEF ONLY]', 'amber', 80);
@@ -446,6 +715,7 @@
                 },
 
                 '7175': async () => {
+                        markFile('U-7175');
                         await header('FILE U-7175');
                         await typeLine('ITEM #: U-7175', 'green', 80);
                         await typeLine('CLASS: PREDATORY / UNCONTAINED', 'red', 80);
@@ -471,6 +741,7 @@
                 },
 
                 '7381': async () => {
+                        markFile('U-7381');
                         await header('FILE U-7381');
                         await typeLine('ITEM #: U-7381', 'green', 80);
                         await typeLine('CLASS: OBJECT / CONFISCATED', 'green', 80);
@@ -492,6 +763,10 @@
                 },
 
                 '9429': async () => {
+                        const h = localNow().getHours();
+                        if (!(h >= 22 || h < 6)) { await noSuchRecord(); return; }
+                        markFile('U-9429');
+                        lsSet('uo_read9429_at', String(nowMs()));
                         await header('FILE U-9429');
                         await typeLine('ITEM #: U-9429', 'green', 80);
                         await typeLine('CLASS: STATIONARY / MEMORIAL', 'green', 80);
@@ -538,6 +813,30 @@
                 'marie': async () => handlers['quinn'](),
                 'marie quinn': async () => handlers['quinn'](),
 
+                'quinn remembers': async () => {
+                        await sleep(1500);
+                        await typeLine('she does.', 'dim', 22);
+                        await sleep(1100);
+                        await typeLine('at the end, she remembered everything.', 'dim', 22);
+                        await sleep(1800);
+                        putLine('');
+                        await typeLine('COMPONENT RECOVERED: ONE (1) IDEA', 'green', 45);
+                        putLine('');
+                        await sleep(1000);
+                        await typeLine('you are not alone.', 'white', 30);
+                        await sleep(600);
+                        await typeLine('you were never alone.', 'white', 30);
+                        await sleep(600);
+                        await typeLine('there is nothing left to be afraid of.', 'white', 30);
+                        putLine('');
+                        await sleep(1600);
+                        await typeLine('MNESTIC CLEARANCE ............. VERIFIED', 'green', 50);
+                        putLine('');
+                        await sleep(900);
+                        await typeLine('it will remember that you remembered.', 'dim', 22);
+                        lsSet('uo_verified', '1');
+                },
+
                 'adam': async () => {
                         await header('PERSONNEL FILE');
                         await typeLine('QUINN, ADAM', 'green', 60);
@@ -578,7 +877,7 @@
                         await typeLine('FIRST DAY: TOMORROW', 'white', 50);
                         putLine('');
                         await sleep(1200);
-        await typeLine('welcome back, simon. again.', 'dim', 25);
+                        await typeLine('welcome back, simon. again.', 'dim', 25);
                 },
                 'simon': async () => handlers['lee'](),
                 'simon lee': async () => handlers['lee'](),
@@ -620,12 +919,65 @@
                         await typeLine('listen: her family is singing, out past the horizon.', 'dim', 25);
                 },
 
+                'vault601': async () => {
+                        await sleep(800);
+                        await typeLine('VAULT 601. INVERTED CONTAINMENT.', 'dim', 40);
+                        putLine('');
+                        await typeLine('you are already inside it.', 'white', 30);
+                        await sleep(700);
+                        await typeLine('this is the only room where it is not.', 'white', 30);
+                        putLine('');
+                        await sleep(1100);
+                        await typeLine('close the door on your way out.', 'dim', 25);
+                },
+                'vault 601': async () => handlers['vault601'](),
+                '601': async () => handlers['vault601'](),
+
+                'b30': async () => {
+                        await header('VAULT B30-000');
+                        await typeLine('HEAVY ENGINEERING. AUTHORIZED PERSONNEL ONLY.', 'amber', 50);
+                        putLine('');
+                        await typeLine('the machine is here.', 'white', 40);
+                        await typeLine('it is almost finished. it has been almost finished', 'white', 40);
+                        await typeLine('for years.', 'white', 40);
+                        putLine('');
+                        await typeLine('it is missing one (1) component.', 'white', 40);
+                        putLine('');
+                        await sleep(1000);
+                        await typeLine('leave an idea. it will not be wasted.', 'dim', 25);
+                        putLine('');
+                        inputMode = 'b30idea';
+                        newPromptLine();
+                },
+                'b30-000': async () => handlers['b30'](),
+                'b30000': async () => handlers['b30'](),
+                'vault b30': async () => handlers['b30'](),
+                'vault b30-000': async () => handlers['b30'](),
+
                 'mnestic': async () => {
                         await typeLine('CLASS-W MNESTIC: sustained-release, low dosage.', 'white', 45);
                         await typeLine('You will remember everything, forever.', 'white', 45);
                         await typeLine('This is less pleasant than it sounds.', 'dim', 35);
                 },
                 'mnestics': async () => handlers['mnestic'](),
+
+                'remember': async () => {
+                        await sleep(900);
+                        if (lsGet('uo_read3125')) {
+                                  await typeLine('remember who?', 'dim', 22);
+                        } else {
+                                  await typeLine('remember what?', 'dim', 22);
+                                       }
+                },
+
+                'forget': async () => {
+                        await sleep(900);
+                        clearScreen();
+                        await sleep(600);
+                        await typeLine('done.', 'dim', 22);
+                        putLine('');
+                        newPromptLine();
+                },
 
                 'unknowns': async () => {
                         await typeLine('if there were an index, this would be it.', 'dim', 25);
@@ -638,6 +990,12 @@
                 },
 
                 'hello': async () => {
+                        const name = lsGet('uo_b30_name');
+                        if (name && drift.helloName) {
+                                  await sleep(1100);
+                                  await typeLine(name + '.', 'dim', 18);
+                                  await sleep(1400);
+                        }
                         await typeLine('nobody is here.', 'dim', 25);
                 },
 
@@ -655,6 +1013,7 @@
                 },
           };
 
+          // ---------- self-redaction ----------
           async function redactWords(lineEl) {
                 const text = lineEl.textContent.replace(/\n$/, '');
                 const words = text.split(' ');
@@ -665,7 +1024,7 @@
                         return p;
                 });
                 lineEl.appendChild(span('\n'));
-                const order = parts.map((_, i) => i).sort(() => Math.random() - 0.5);
+                const order = parts.map((_, i) => i).sort(() => rnd() - 0.5);
                 for (const i of order) {
                         const p = parts[i];
                         const len = p.textContent.trimEnd().length;
