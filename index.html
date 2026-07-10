@@ -167,6 +167,11 @@
                 const d = localNow();
                 return d.getFullYear() * 12 + d.getMonth();
           }
+
+          function isNov11() {
+                const d = localNow();
+                return d.getMonth() === 10 && d.getDate() === 11;
+          }
           const whisperPool = [
                 'you were about to type something. what was it?',
                 'the cursor is not blinking for you.',
@@ -226,6 +231,12 @@
                         const t = typos[Math.floor(rnd() * typos.length)];
                         lines = lines.map(l => l[0] === t[0] ? [t[1], l[1], l[2]] : l);
                 }
+
+                if (isNov11()) {
+                        lines = lines.map(l =>
+                                  l[0] === 'ERROR: NO SUCH DIVISION.'
+                                                    ? ['CONNECTED.', '', 600] : l);
+                }
                 return lines;
           }
 
@@ -280,6 +291,12 @@
                         await typeLine('retention: ' + days + (days === 1 ? ' day' : ' days'), 'dim', 30);
                         putLine('');
                         await sleep(900);
+                }
+
+                if (rnd() < 0.01) {
+                        const originalTitle = document.title;
+                        document.title = 'Marie Quinn';
+                        setTimeout(() => { document.title = originalTitle; }, 500);
                 }
 
                 startTerminal();
@@ -963,8 +980,9 @@
                         putLine('  │ ARCHIVE │ ARCHIVE │  CCTV   │', 'white');
                         putLine('  │    A    │    B    │  ROOM   │', 'white');
                         putLine('  ├─────────┼─────────┼─────────┤', 'white');
-                        putLine('  │  VAULT  │         │  MESS   │', 'white');
-                        putLine('  │  3011A  │         │  HALL   │', 'white');
+                        const b30bLeak = rnd() < 0.05;
+                        putLine('  │  VAULT  │' + (b30bLeak ? '  VAULT  ' : '         ') + '│  MESS   │', 'white');
+                        putLine('  │  3011A  │' + (b30bLeak ? '  3011B  ' : '         ') + '│  HALL   │', 'white');
                         putLine('  └─────────┴─────────┴─────────┘', 'white');
                         putLine('');
                         await sleep(1400);
@@ -974,7 +992,7 @@
 
                 'incident': async () => {
                         await header('INCIDENT REPORTS');
-                        await typeLine('INCIDENT REPORTS: 118 AVAILABLE.', 'white', 45);
+                        await typeLine('INCIDENT REPORTS: ' + (rnd() < 0.04 ? 119 : 118) + ' AVAILABLE.', 'white', 45);
                         await sleep(900);
                         await typeLine('117 UNREADABLE.', 'amber', 45);
                         putLine('');
@@ -1031,7 +1049,9 @@
                         await typeLine('LEVEL 0: you have already forgotten this document.', 'white', 50);
                         await typeLine('LEVEL 1: retains the Division for one briefing.', 'white', 50);
                         await typeLine('LEVEL 2: retains the Division between briefings.', 'white', 50);
-                        await typeLine('         reports headaches.', 'white', 50);
+                        if (rnd() >= 0.04) {
+                                  await typeLine('         reports headaches.', 'white', 50);
+                        }
                         await typeLine('LEVEL 3: remembers what the Division is for.', 'white', 50);
                         await typeLine('         do not envy them.', 'white', 50);
                         await typeLine('LEVEL 4: [record exceeds your clearance]', 'amber', 50);
@@ -1048,7 +1068,7 @@
                         await typeLine('        do not look closely at it.', 'white', 50);
                         await typeLine('PAGE 3: in a memory emergency, stay where you are.', 'white', 50);
                         await typeLine('        someone who remembers you will come.', 'white', 50);
-                        await typeLine('PAGE 5: welcome aboard. again.', 'white', 50);
+                        await typeLine((rnd() < 0.04 ? 'PAGE 6' : 'PAGE 5') + ': welcome aboard. again.', 'white', 50);
                         putLine('');
                         await sleep(1300);
                         await typeLine('we do not discuss page 4.', 'dim', 25);
@@ -1067,7 +1087,7 @@
                         await typeLine('  ██████████████ DIVISION', 'white', 60);
                         await typeLine('  PAYROLL', 'white', 60);
                         await typeLine('  MAINTENANCE', 'white', 60);
-                        await typeLine('  (38 more)', 'dim', 60);
+                        await typeLine('  (' + (rnd() < 0.04 ? 39 : 38) + ' more)', 'dim', 60);
                         putLine('');
                         await sleep(1100);
                         await typeLine('one entry could not be rendered. this is normal.', 'dim', 25);
@@ -1201,6 +1221,15 @@
                 },
           };
 
+          if (isNov11()) {
+                handlers['division'] = async () => {
+                        await sleep(900);
+                        await typeLine('it is here today.', 'green', 30);
+                        await sleep(900);
+                        await typeLine('it will not be, tomorrow.', 'dim', 25);
+                };
+          }
+
           async function redactWords(lineEl) {
                 const text = lineEl.textContent.replace(/\n$/, '');
                 const words = text.split(' ');
@@ -1224,5 +1253,8 @@
           boot();
       })();
     </script>
+    <!--
+    You should not be able to read this.
+    -->
   </body>
 </html>
