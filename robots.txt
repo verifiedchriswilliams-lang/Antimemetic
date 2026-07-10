@@ -3,3 +3,5 @@ Disallow: /vault601/
 Disallow: /remember/
 Disallow: /forget/
 Disallow: /b30-000/
+
+Sitemap:
