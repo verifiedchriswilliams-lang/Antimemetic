@@ -1,465 +1,682 @@
 <!DOCTYPE html>
-  <html lang="en">
+<html lang="en">
   <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="noindex">
-  <title>&#8203;</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>&#8203;</title>
   <!--
-    Prototype for thereisnoantimemeticsdivision.com
-    SCP-055, SCP-3125, SCP-2256 and related concepts originate from the
-  SCP Foundation wiki (scp-wiki.wikidot.com) and works by qntm (Sam Hughes),
-  licensed under CC BY-SA 3.0. This page is a derivative work and is
-  likewise shared under CC BY-SA 3.0. Type "credits" at the terminal.
+    thereisnoantimemeticsdivision.com
+    An unofficial fan work inspired by "There Is No Antimemetics Division"
+    by qntm (Sam Hughes). Concepts originating on the SCP Foundation wiki
+    (scp-wiki.wikidot.com) are licensed CC BY-SA 3.0; this page is a
+    derivative work and is likewise shared under CC BY-SA 3.0.
+    Type "credits" at the terminal. Read the book.
   -->
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-        height: 100%;
-    background: #000;
-    overflow: hidden;
-}
-  body {
-        font-family: "Courier New", Courier, monospace;
-    font-size: 16px;
-    line-height: 1.45;
-    color: #b8b8b8;
-        cursor: default;
-}
-  #crt {
-    position: fixed; inset: 0;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-            to bottom,
-            rgba(255,255,255,0.015) 0px,
-            rgba(255,255,255,0.015) 1px,
-            transparent 1px,
-            transparent 3px
-          );
-    z-index: 10;
-}
-  #screen {
-    height: 100%;
-    padding: 28px 32px;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-  #screen::-webkit-scrollbar { width: 0; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+            height: 100%;
+            background: #000;
+            overflow: hidden;
+      }
+      body {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 16px;
+            line-height: 1.45;
+            color: #b8b8b8;
+            cursor: default;
+      }
+      #crt {
+            position: fixed; inset: 0;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                    to bottom,
+                    rgba(255,255,255,0.015) 0px,
+                    rgba(255,255,255,0.015) 1px,
+                    transparent 1px,
+                    transparent 3px
+                  );
+            z-index: 10;
+      }
+      #screen {
+            height: 100%;
+            padding: 28px 32px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+      }
+      #screen::-webkit-scrollbar { width: 0; }
 
-  .boot { color: #33ff66; }
-  .boot .warn { color: #ffb000; }
-    .boot .err  { color: #ff4444; }
+      .boot { color: #33ff66; }
+      .boot .warn { color: #ffb000; }
+      .boot .err  { color: #ff4444; }
 
-  .dim    { color: #555; }
-  .white  { color: #e8e8e8; }
-  .green  { color: #33ff66; }
-  .amber  { color: #ffb000; }
-    .red    { color: #ff4444; }
-    .redact {
-          background: #b8b8b8; color: #b8b8b8;
-              user-select: none;
-  }
+      .dim    { color: #555; }
+      .white  { color: #e8e8e8; }
+      .green  { color: #33ff66; }
+      .amber  { color: #ffb000; }
+      .red    { color: #ff4444; }
+      .redact {
+            background: #b8b8b8; color: #b8b8b8;
+            user-select: none;
+      }
 
-  #cursor {
-    display: inline-block;
-    width: 9px; height: 18px;
-    background: #b8b8b8;
-        vertical-align: text-bottom;
-    animation: blink 1.06s steps(1) infinite;
-            }
-  @keyframes blink { 50% { background: transparent; } }
+      #cursor {
+            display: inline-block;
+            width: 9px; height: 18px;
+            background: #b8b8b8;
+            vertical-align: text-bottom;
+            animation: blink 1.06s steps(1) infinite;
+      }
+      @keyframes blink { 50% { background: transparent; } }
 
-  .glitch { animation: glitchShake 0.08s infinite; }
-  @keyframes glitchShake {
-        0%   { transform: translate(0,0); }
-    25%  { transform: translate(-1px,1px); }
-    50%  { transform: translate(1px,-1px); }
-    75%  { transform: translate(-1px,-1px); }
-    100% { transform: translate(1px,1px); }
-          }
-</style>
+      .glitch { animation: glitchShake 0.08s infinite; }
+      @keyframes glitchShake {
+            0%   { transform: translate(0,0); }
+            25%  { transform: translate(-1px,1px); }
+            50%  { transform: translate(1px,-1px); }
+            75%  { transform: translate(-1px,-1px); }
+            100% { transform: translate(1px,1px); }
+      }
+    </style>
   </head>
-<body>
-  <div id="crt"></div>
-  <div id="screen"></div>
+  <body>
+    <div id="crt"></div>div>
+    <div id="screen"></div>div>
 
-  <script>
-  (() => {
-    const screen = document.getElementById('screen');
-  const sleep = ms => new Promise(r => setTimeout(r, ms));
+    <script>
+      (() => {
+          const screen = document.getElementById('screen');
+          const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-  let cursorEl = null;
+          let cursorEl = null;
 
-  function makeCursor() {
-    const c = document.createElement('span');
-    c.id = 'cursor';
-    return c;
-}
-  function scrollBottom() { screen.scrollTop = screen.scrollHeight; }
+          function makeCursor() {
+                const c = document.createElement('span');
+                c.id = 'cursor';
+                return c;
+          }
+          function scrollBottom() { screen.scrollTop = screen.scrollHeight; }
 
-  function span(text, cls) {
-    const s = document.createElement('span');
-    if (cls) s.className = cls;
-    s.textContent = text;
-    return s;
-}
+          function span(text, cls) {
+                const s = document.createElement('span');
+                if (cls) s.className = cls;
+                s.textContent = text;
+                return s;
+          }
 
-  function putLine(text, cls) {
-    screen.appendChild(span(text + '\n', cls));
-    scrollBottom();
-}
+          function putLine(text, cls) {
+                screen.appendChild(span(text + '\n', cls));
+                scrollBottom();
+          }
 
-  let skipTyping = false;
-  async function typeLine(text, cls, cps = 40) {
-    const s = span('', cls);
-    screen.appendChild(s);
-    for (let i = 0; i < text.length; i++) {
-      s.textContent += text[i];
-      scrollBottom();
-      if (!skipTyping) await sleep(1000 / cps);
-}
-    s.textContent += '\n';
-    scrollBottom();
-    return s;
-}
+          let skipTyping = false;
+          async function typeLine(text, cls, cps = 40) {
+                const s = span('', cls);
+                screen.appendChild(s);
+                for (let i = 0; i < text.length; i++) {
+                        s.textContent += text[i];
+                        scrollBottom();
+                        if (!skipTyping) await sleep(1000 / cps);
+                }
+                s.textContent += '\n';
+                scrollBottom();
+                return s;
+          }
 
-  function clearScreen() {
-    screen.innerHTML = '';
-    skipTyping = false;
-}
+          function clearScreen() {
+                screen.innerHTML = '';
+                skipTyping = false;
+          }
 
-  const bootLines = [
-    ['SCiPNET DIRECT ACCESS TERMINAL v4.7.1', '', 120],
-    ['(c) SCP FOUNDATION. SECURE. CONTAIN. PROTECT.', '', 40],
-    ['', '', 0],
-    ['BIOS DATE 04/11/91   CPU 486DX @ 33MHz', 'dim', 30],
-    ['MEMORY TEST : 65536 KB OK', 'dim', 200],
-    ['', '', 0],
-    ['LOADING KERNEL ................ OK', '', 250],
-    ['MOUNTING /dev/veil ............ OK', '', 250],
-    ['COGNITOHAZARD FILTER .......... ACTIVE', '', 250],
-    ['MEMETIC INOCULATION ........... CURRENT', '', 250],
-    ['MNESTIC CLEARANCE ............. VERIFYING', '', 700],
-    ['MNESTIC CLEARANCE ............. UNVERIFIED', 'warn', 300],
-    ['', '', 0],
-    ['WARNING: YOU ARE ACCESSING A FOUNDATION SYSTEM WITHOUT', 'warn', 20],
-    ['MNESTIC SUPPORT. UNAUTHORIZED PERSONNEL WILL NOT REMEMBER', 'warn', 20],
-    ['THIS VISIT.', 'warn', 400],
-    ['', '', 0],
-    ['CONNECTING TO ANTIMEMETICS DIVISION FILESERVER...', '', 900],
-    ['', '', 0],
-    ['ERROR: NO SUCH DIVISION.', 'err', 600],
-  ];
+          const bootLines = [
+                ['UO SECURE TERMINAL v4.7.1', '', 120],
+                ['UNKNOWN ORGANISATION. WE KEEP WHAT CANNOT BE KEPT.', '', 40],
+                ['', '', 0],
+                ['BIOS DATE 04/11/91   CPU 486DX @ 33MHz', 'dim', 30],
+                ['MEMORY TEST : 65536 KB OK', 'dim', 200],
+                ['', '', 0],
+                ['LOADING KERNEL ................ OK', '', 250],
+                ['MOUNTING /dev/veil ............ OK', '', 250],
+                ['COGNITOHAZARD FILTER .......... ACTIVE', '', 250],
+                ['MEMETIC INOCULATION ........... CURRENT', '', 250],
+                ['MNESTIC CLEARANCE ............. VERIFYING', '', 700],
+                ['MNESTIC CLEARANCE ............. UNVERIFIED', 'warn', 300],
+                ['', '', 0],
+                ['WARNING: YOU ARE ACCESSING THIS SYSTEM WITHOUT MNESTIC', 'warn', 20],
+                ['SUPPORT. UNAUTHORIZED PERSONNEL WILL NOT REMEMBER', 'warn', 20],
+                ['THIS VISIT.', 'warn', 400],
+                ['', '', 0],
+                ['CONNECTING TO ANTIMEMETICS DIVISION FILESERVER...', '', 900],
+                ['', '', 0],
+                ['ERROR: NO SUCH DIVISION.', 'err', 600],
+              ];
 
-  let bootSkipped = false;
-  function skipBoot() { bootSkipped = true; skipTyping = true; }
+          let bootSkipped = false;
+          function skipBoot() { bootSkipped = true; skipTyping = true; }
 
-  async function boot() {
-    document.addEventListener('keydown', skipBoot, { once: true });
-    document.addEventListener('click', skipBoot, { once: true });
-    const wrap = document.createElement('span');
-    wrap.className = 'boot';
-    screen.appendChild(wrap);
-    for (const [text, cls, pause] of bootLines) {
-      const s = span(text + '\n', cls);
-      wrap.appendChild(s);
-      scrollBottom();
-      if (!bootSkipped) await sleep(pause + text.length * 8);
-    }
-    await sleep(bootSkipped ? 200 : 1400);
-    document.removeEventListener('keydown', skipBoot);
-    document.removeEventListener('click', skipBoot);
-    clearScreen();
-    await sleep(600);
-    startTerminal();
-}
+          async function boot() {
+                document.addEventListener('keydown', skipBoot, { once: true });
+                document.addEventListener('click', skipBoot, { once: true });
+                const wrap = document.createElement('span');
+                wrap.className = 'boot';
+                screen.appendChild(wrap);
+                for (const [text, cls, pause] of bootLines) {
+                        const s = span(text + '\n', cls);
+                        wrap.appendChild(s);
+                        scrollBottom();
+                        if (!bootSkipped) await sleep(pause + text.length * 8);
+                }
+                await sleep(bootSkipped ? 200 : 1400);
+                document.removeEventListener('keydown', skipBoot);
+                document.removeEventListener('click', skipBoot);
+                clearScreen();
+                await sleep(600);
+                startTerminal();
+          }
 
-  let inputSpan = null;
-  let buffer = '';
-  let accepting = false;
-  let busy = false;
-  let failedAttempts = 0;
-  let idleTimer = null;
-  let idleFired = false;
+          let inputSpan = null;
+          let buffer = '';
+          let accepting = false;
+          let busy = false;
+          let failedAttempts = 0;
+          let idleTimer = null;
+          let idleFired = false;
 
-  function newPromptLine() {
-    inputSpan = span('', 'white');
-    screen.appendChild(inputSpan);
-    cursorEl = makeCursor();
-    screen.appendChild(cursorEl);
-    scrollBottom();
-    buffer = '';
-    accepting = true;
-    resetIdle();
-}
+          function newPromptLine() {
+                inputSpan = span('', 'white');
+                screen.appendChild(inputSpan);
+                cursorEl = makeCursor();
+                screen.appendChild(cursorEl);
+                scrollBottom();
+                buffer = '';
+                accepting = true;
+                resetIdle();
+          }
 
-  function removePrompt() {
-    accepting = false;
-    if (cursorEl) { cursorEl.remove(); cursorEl = null; }
-}
+          function removePrompt() {
+                accepting = false;
+                if (cursorEl) { cursorEl.remove(); cursorEl = null; }
+          }
 
-  function resetIdle() {
-    clearTimeout(idleTimer);
-    if (idleFired) return;
-    idleTimer = setTimeout(idleWhisper, 60000);
-}
+          function resetIdle() {
+                clearTimeout(idleTimer);
+                if (idleFired) return;
+                idleTimer = setTimeout(idleWhisper, 60000);
+          }
 
-  async function idleWhisper() {
-    if (!accepting || busy || buffer.length) { resetIdle(); return; }
-    idleFired = true;
-    busy = true;
-    removePrompt();
-    const s = span('', 'dim');
-    screen.appendChild(s);
-    const msg = 'you were about to type something. what was it?';
-    for (const ch of msg) { s.textContent += ch; scrollBottom(); await sleep(55); }
-    await sleep(2600);
-    while (s.textContent.length) {
-      s.textContent = s.textContent.slice(0, -1);
-      await sleep(18);
-}
-    s.remove();
-    busy = false;
-    newPromptLine();
-}
+          async function idleWhisper() {
+                if (!accepting || busy || buffer.length) { resetIdle(); return; }
+                idleFired = true;
+                busy = true;
+                removePrompt();
+                const s = span('', 'dim');
+                screen.appendChild(s);
+                const msg = 'you were about to type something. what was it?';
+                for (const ch of msg) { s.textContent += ch; scrollBottom(); await sleep(55); }
+                await sleep(2600);
+                while (s.textContent.length) {
+                        s.textContent = s.textContent.slice(0, -1);
+                        await sleep(18);
+                }
+                s.remove();
+                busy = false;
+                newPromptLine();
+          }
 
-  function startTerminal() {
-    newPromptLine();
-    document.addEventListener('keydown', onKey);
-}
+          function startTerminal() {
+                newPromptLine();
+                document.addEventListener('keydown', onKey);
+          }
 
-  function onKey(e) {
-    if (!accepting || busy) return;
-    resetIdle();
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      submit();
-} else if (e.key === 'Backspace') {
-      e.preventDefault();
-      buffer = buffer.slice(0, -1);
-      inputSpan.textContent = buffer;
-} else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      e.preventDefault();
-      if (buffer.length < 60) {
-        buffer += e.key;
-        inputSpan.textContent = buffer;
-}
-      scrollBottom();
-}
-}
+          function onKey(e) {
+                if (!accepting || busy) return;
+                resetIdle();
+                if (e.key === 'Enter') {
+                        e.preventDefault();
+                        submit();
+                } else if (e.key === 'Backspace') {
+                        e.preventDefault();
+                        buffer = buffer.slice(0, -1);
+                        inputSpan.textContent = buffer;
+                } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                        e.preventDefault();
+                        if (buffer.length < 60) {
+                                  buffer += e.key;
+                                  inputSpan.textContent = buffer;
+                        }
+                        scrollBottom();
+                }
+          }
 
-  async function submit() {
-    const raw = buffer.trim();
-    removePrompt();
-    busy = true;
-    const cmd = normalize(raw);
+          async function submit() {
+                const raw = buffer.trim();
+                removePrompt();
+                busy = true;
+                const cmd = normalize(raw);
 
-    if (!raw) {
-} else if (handlers[cmd]) {
-      putLine('');
-      await handlers[cmd]();
-} else {
-      await unknown(raw);
-}
-    busy = false;
-    if (!accepting) { putLine(''); newPromptLine(); }
-}
+                if (!raw) {
+                } else if (handlers[cmd]) {
+                        putLine('');
+                        await handlers[cmd]();
+                } else {
+                        await unknown(raw);
+                }
+                busy = false;
+                if (!accepting) { putLine(''); newPromptLine(); }
+          }
 
-  function normalize(s) {
-    let c = s.toLowerCase().replace(/^scp[-\s]*/,'').trim();
-    if (/^\d+$/.test(c)) c = String(parseInt(c, 10));
-    return c;
-}
+          function normalize(s) {
+                let c = s.toLowerCase().trim();
+                c = c.replace(/^(scp|u)[-\s]*/, '');
+                if (/^\d+$/.test(c)) c = String(parseInt(c, 10));
+                return c;
+          }
 
-  async function unknown(raw) {
-    failedAttempts++;
-    await sleep(400);
-    while (inputSpan.textContent.length) {
-      inputSpan.textContent = inputSpan.textContent.slice(0, -1);
-      await sleep(30);
-}
-    inputSpan.remove();
-    if (failedAttempts === 3) {
-      await sleep(800);
-      await typeLine('stop guessing.', 'dim', 18);
-      await typeLine('you already know the number.', 'dim', 18);
-      putLine('');
-}
-}
+          async function unknown(raw) {
+                failedAttempts++;
+                await sleep(400);
+                while (inputSpan.textContent.length) {
+                        inputSpan.textContent = inputSpan.textContent.slice(0, -1);
+                        await sleep(30);
+                }
+                inputSpan.remove();
+                if (failedAttempts === 3) {
+                        await sleep(800);
+                        await typeLine('stop guessing.', 'dim', 18);
+                        await typeLine('you already know the number.', 'dim', 18);
+                        putLine('');
+                }
+          }
 
-  async function header(item, cls) {
-    await typeLine('ACCESSING ' + item + ' ...', 'dim', 60);
-    await sleep(500);
-    putLine('');
-}
+          async function header(item) {
+                await typeLine('ACCESSING ' + item + ' ...', 'dim', 60);
+                await sleep(500);
+                putLine('');
+          }
 
-  const handlers = {
+          const handlers = {
 
-    '55': async () => {
-      await header('FILE #055');
-      await typeLine('ITEM #: SCP-055', 'green', 80);
-      await typeLine('OBJECT CLASS: [UNKNOWN]', 'green', 80);
-      putLine('');
-      await typeLine('SPECIAL CONTAINMENT PROCEDURES: [DATA LOST]', 'white', 60);
-      putLine('');
-      await typeLine('DESCRIPTION: SCP-055 is a "self-keeping secret."', 'white', 50);
-      await typeLine('All personnel who have observed SCP-055 have proven', 'white', 50);
-      await typeLine('unable to retain any information about it. Personnel', 'white', 50);
-      await typeLine('are, however, able to recall attributes SCP-055 does', 'white', 50);
-      await typeLine('NOT possess. It is known that:', 'white', 50);
-      putLine('');
-      await typeLine('    - SCP-055 is not spherical.', 'white', 50);
-      await typeLine('    - SCP-055 is not round.', 'white', 50);
-      putLine('');
-      await typeLine('No records of the acquisition of SCP-055 exist. No one', 'white', 50);
-      await typeLine('knows why we have it. No one remembers what it is.', 'white', 50);
-      putLine('');
-      await sleep(900);
-      await typeLine('ADDENDUM: it is not a sphere.', 'amber', 40);
-      putLine('');
-      await sleep(1400);
-      await typeLine('have you forgotten something?', 'dim', 25);
-},
+                '55': async () => {
+                        await header('FILE U-0055');
+                        await typeLine('ITEM #: U-0055', 'green', 80);
+                        await typeLine('CLASS: [UNKNOWN]', 'green', 80);
+                        await typeLine('LOCATION: UO PRIMARY ARCHIVE FACILITY, BLACK RIVER', 'green', 80);
+                        putLine('');
+                        await typeLine('CONTAINMENT: 5.00 x 5.00 x 2.50m unit. Do not post', 'white', 55);
+                        await typeLine('security personnel outside the unit. There is no', 'white', 55);
+                        await typeLine('reason to post security personnel outside the unit.', 'white', 55);
+                        await typeLine('There is nothing in the unit.', 'white', 55);
+                        putLine('');
+                        await typeLine('DESCRIPTION: U-0055 is a "self-keeping secret."', 'white', 55);
+                        await typeLine('It can be observed. It can be recorded. Extensive', 'white', 55);
+                        await typeLine('logs exist. No one can recall their content, or', 'white', 55);
+                        await typeLine('the entity, or writing the logs.', 'white', 55);
+                        putLine('');
+                        await typeLine('Personnel are, however, able to retain attributes', 'white', 55);
+                        await typeLine('U-0055 does NOT possess. It is known that:', 'white', 55);
+                        putLine('');
+                        await typeLine('    - U-0055 is not spherical.', 'white', 55);
+                        await typeLine('    - U-0055 is not round.', 'white', 55);
+                        putLine('');
+                        await typeLine('No one knows why we have it. No one remembers', 'white', 55);
+                        await typeLine('what it is. No action can be taken.', 'white', 55);
+                        putLine('');
+                        await sleep(900);
+                        await typeLine('ADDENDUM: it is not a sphere.', 'amber', 40);
+                        putLine('');
+                        await sleep(1400);
+                        await typeLine('have you forgotten something?', 'dim', 25);
+                },
 
-    '2256': async () => {
-      await header('FILE #2256');
-      const lines = [];
-      lines.push(await typeLine('ITEM #: SCP-2256', 'green', 80));
-      lines.push(await typeLine('OBJECT CLASS: NEUTRALIZED', 'green', 80));
-      putLine('');
-              lines.push(await typeLine('DESCRIPTION: SCP-2256 was a species of extremely', 'white', 55));
-      lines.push(await typeLine('large ambulatory organisms native to the South', 'white', 55));
-      lines.push(await typeLine('Pacific, standing up to one kilometre tall. The', 'white', 55));
-      lines.push(await typeLine('species evaded predation for millions of years by', 'white', 55));
-      lines.push(await typeLine('developing perception-suppressing anomalous traits:', 'white', 55));
-      lines.push(await typeLine('it could not be directly perceived, recorded, or', 'white', 55));
-      lines.push(await typeLine('remembered. The last known specimen died in 2002.', 'white', 55));
-      putLine('');
-              lines.push(await typeLine('Data concerning SCP-2256 is stored in fragments to', 'white', 55));
-      lines.push(await typeLine('prevent further information decay. Do not assemble', 'white', 55));
-      lines.push(await typeLine('these fragments in one place.', 'white', 55));
-      putLine('');
-              await sleep(1200);
-      await typeLine('NOTICE: INFORMATION DECAY IN PROGRESS.', 'red', 40);
-      await sleep(900);
-      for (const lineEl of lines) {
-                await redactWords(lineEl);
-      }
-      await sleep(600);
-      await typeLine('you should have read faster.', 'dim', 25);
-      },
+                '2200': async () => {
+                        await header('FILE U-2200');
+                        await typeLine('ITEM #: U-2200', 'green', 80);
+                        await typeLine('CLASS: PASSIVE / COOPERATIVE', 'green', 80);
+                        await typeLine('LOCATION: PASSIVE CONTAINMENT ARCHIVE, UO WYELEIGH', 'green', 80);
+                        putLine('');
+                        await typeLine('DESCRIPTION: U-2200 is a non-corporeal telepathic', 'white', 55);
+                        await typeLine('entity residing in a stone monolith. It identifies', 'white', 55);
+                        await typeLine('itself as the prehistoric Johorean god of forgetting', 'white', 55);
+                        await typeLine('how to ride a bicycle.', 'white', 55);
+                        putLine('');
+                        await typeLine('U-2200 subsists on voluntarily surrendered memories', 'white', 55);
+                        await typeLine('of bicycle riding. It is talkative, unhelpful, and', 'white', 55);
+                        await typeLine('persistently advises visitors to take a holiday.', 'white', 55);
+                        putLine('');
+                        await typeLine('INTERVIEW EXCERPT:', 'amber', 50);
+                        await typeLine('  "you seem tired."', 'white', 40);
+                        await typeLine('  "have you considered barbados?"', 'white', 40);
+                        putLine('');
+                        await sleep(1600);
+                        await typeLine('NOTE: now that you have finished this file, please', 'dim', 30);
+                        await typeLine('take a moment to confirm that you still remember', 'dim', 30);
+                        await typeLine('how to ride a bicycle.', 'dim', 30);
+                },
 
-    '3125': async () => {
-      if (!sessionStorage.getItem('override3125')) {
-        sessionStorage.setItem('override3125', '1');
-        await typeLine('FILE #3125 IS RESTRICTED.', 'amber', 50);
-        await typeLine('MNESTIC CLEARANCE LEVEL 3 REQUIRED.', 'amber', 50);
-        putLine('');
-        await typeLine('enter the number again to override. this is not recommended.', 'dim', 30);
-        return;
-}
-      await header('FILE #3125 - OVERRIDE ACCEPTED');
-      await typeLine('ITEM #: SCP-3125', 'green', 80);
-      await typeLine('OBJECT CLASS: KETER', 'red', 80);
-      putLine('');
-      await typeLine('SPECIAL CONTAINMENT PROCEDURES: SCP-3125 is contained', 'white', 55);
-      await typeLine('within a conceptual boundary which human minds cannot', 'white', 55);
-      await typeLine('cross without total loss of self. Do not think about', 'white', 55);
-      await typeLine('SCP-3125. Do not attempt to remember this file.', 'white', 55);
-      putLine('');
-      await typeLine('DESCRIPTION: SCP-3125 is a fifth-dimensional memetic', 'white', 55);
-      await typeLine('complex of hostile ideas. It consumes the concepts of', 'white', 55);
-      await typeLine('the people who perceive it, replacing them with itself.', 'white', 55);
-      await typeLine('Anyone who becomes aware of SCP-3125 in sufficient', 'white', 55);
-      await typeLine('detail becomes part of SCP-3125.', 'white', 55);
-      putLine('');
-      await typeLine('You have now read this file.', 'white', 45);
-      await sleep(1600);
-      const g = await typeLine('IT IS ALREADY HERE. IT WAS ALWAYS ALREADY HERE.', 'red', 30);
-      g.classList.add('glitch');
-      await sleep(1800);
-      clearScreen();
-      await sleep(2500);
-      sessionStorage.removeItem('override3125');
-      await typeLine('what were you reading?', 'dim', 22);
-      putLine('');
-      newPromptLine();
-},
+                '2256': async () => {
+                        await header('FILE U-2256');
+                        const lines = [];
+                        lines.push(await typeLine('ITEM #: U-2256', 'green', 80));
+                        lines.push(await typeLine('CLASS: NEUTRALIZED', 'green', 80));
+                        putLine('');
+                        lines.push(await typeLine('DESCRIPTION: U-2256 (Cryptomorpha gigantes) was a', 'white', 55));
+                        lines.push(await typeLine('species of gigafauna endemic to the South Pacific,', 'white', 55));
+                        lines.push(await typeLine('exceeding 1,000 metres in height and weighing no', 'white', 55));
+                        lines.push(await typeLine('more than four tons. Its antimemetic camouflage', 'white', 55));
+                        lines.push(await typeLine('rendered it impossible to perceive, record, or', 'white', 55));
+                        lines.push(await typeLine('remember. It evolved this to evade a predator.', 'white', 55));
+                        putLine('');
+                        lines.push(await typeLine('The people of Takalu\'i could see them, using a', 'white', 55));
+                        lines.push(await typeLine('suppressant called kaketou. They called them', 'white', 55));
+                        lines.push(await typeLine('lopo\'ongakau: the ones who walk very slowly.', 'white', 55));
+                        lines.push(await typeLine('They believed they held up the horizon.', 'white', 55));
+                        putLine('');
+                        lines.push(await typeLine('The last known specimen died in 2006. Observation', 'white', 55));
+                        lines.push(await typeLine('by this Organisation is believed to have', 'white', 55));
+                        lines.push(await typeLine('contributed to the extinction.', 'white', 55));
+                        putLine('');
+                        await sleep(1200);
+                        await typeLine('NOTICE: INFORMATION DECAY IN PROGRESS.', 'red', 40);
+                        await sleep(900);
+                        for (const lineEl of lines) {
+                                  await redactWords(lineEl);
+                        }
+                        await sleep(1000);
+                        await typeLine('ADDENDUM [POST-EVENT]: there is something on the', 'amber', 35);
+                        await typeLine('horizon. classification NEUTRALIZED under review.', 'amber', 35);
+                        putLine('');
+                        await sleep(800);
+                        await typeLine('you should have read faster.', 'dim', 25);
+                },
 
-    'wheeler': async () => {
-      await header('PERSONNEL FILE');
-      await typeLine('WHEELER, MARION', 'green', 60);
-      await typeLine('ANTIMEMETICS DIVISION - CHIEF', 'green', 60);
-      putLine('');
-      const s = span('STATUS: ', 'white');
-      screen.appendChild(s);
-      const st = span('', 'amber');
-      screen.appendChild(st);
-      scrollBottom();
-      const states = ['ACTIVE', 'DECEASED', 'ACTIVE', 'DECEASED', 'ACTIVE', '[UNRESOLVED]'];
-      for (const t of states) {
-                st.textContent = t;
-        await sleep(650);
-      }
-      putLine('');
-      putLine('');
-      await typeLine('she is still winning.', 'dim', 25);
-},
+                '3125': async () => {
+                        if (!sessionStorage.getItem('override3125')) {
+                                  sessionStorage.setItem('override3125', '1');
+                                  await typeLine('FILE U-3125 IS RESTRICTED.', 'amber', 50);
+                                  await typeLine('MNESTIC CLEARANCE LEVEL 3 REQUIRED.', 'amber', 50);
+                                  putLine('');
+                                  await typeLine('enter the number again to override. this is not recommended.', 'dim', 30);
+                                  return;
+                        }
+                        await header('FILE U-3125 - OVERRIDE ACCEPTED');
+                        await typeLine('ITEM #: U-3125', 'green', 80);
+                        await typeLine('CLASS: CATEGORY EPSILON', 'red', 80);
+                        await typeLine('LOCATION: VAULT 601, UO WYELEIGH', 'green', 80);
+                        putLine('');
+                        await typeLine('CONTAINMENT: inverted. Vault 601 is not where', 'white', 55);
+                        await typeLine('U-3125 is kept. Vault 601 is the only place', 'white', 55);
+                        await typeLine('U-3125 is not.', 'white', 55);
+                        putLine('');
+                        await typeLine('DESCRIPTION: U-3125 is an aggressive extradimensional', 'white', 55);
+                        await typeLine('complex of hostile ideas. It manifests wherever it is', 'white', 55);
+                        await typeLine('recognized, and kills anyone who perceives the pattern', 'white', 55);
+                        await typeLine('it casts. It has consumed every antimemetics research', 'white', 55);
+                        await typeLine('group on Earth but one.', 'white', 55);
+                        putLine('');
+                        await typeLine('You have now read this file.', 'white', 45);
+                        await sleep(1600);
+                        const g = await typeLine('IT IS ALREADY HERE. IT WAS ALWAYS ALREADY HERE.', 'red', 30);
+                        g.classList.add('glitch');
+                        await sleep(1800);
+                        clearScreen();
+                        await sleep(2500);
+                        sessionStorage.removeItem('override3125');
+                        await typeLine('what were you reading?', 'dim', 22);
+                        putLine('');
+                        newPromptLine();
+                },
 
-    'marion': async () => handlers['wheeler'](),
-    'marion wheeler': async () => handlers['wheeler'](),
+                '4987': async () => {
+                        await header('FILE U-4987');
+                        await typeLine('ITEM #: U-4987', 'green', 80);
+                        await typeLine('CLASS: [RESTRICTED - DIVISION CHIEF ONLY]', 'amber', 80);
+                        putLine('');
+                        await typeLine('CONTAINMENT: U-4987 is not contained.', 'white', 55);
+                        await typeLine('U-4987 is in use.', 'white', 55);
+                        putLine('');
+                        await typeLine('DESCRIPTION: [REDACTED AT THE REQUEST OF THE', 'white', 55);
+                        await typeLine('DIVISION CHIEF]', 'white', 55);
+                        putLine('');
+                        await sleep(1400);
+                        await typeLine('it holds what she cannot afford to carry.', 'dim', 28);
+                        await sleep(900);
+                        await typeLine('do not disturb it. do not disturb her.', 'dim', 28);
+                },
 
-    'mnestic': async () => {
-      await typeLine('CLASS-W MNESTIC: sustained-release, low dosage.', 'white', 45);
-      await typeLine('You will remember everything, forever.', 'white', 45);
-      await typeLine('This is less pleasant than it sounds.', 'dim', 35);
-},
-    'mnestics': async () => handlers['mnestic'](),
+                '7175': async () => {
+                        await header('FILE U-7175');
+                        await typeLine('ITEM #: U-7175', 'green', 80);
+                        await typeLine('CLASS: PREDATORY / UNCONTAINED', 'red', 80);
+                        await typeLine('FILE STATUS: INCOMPLETE - ASSIGNED: S. LEE', 'amber', 80);
+                        putLine('');
+                        await typeLine('DESCRIPTION: U-7175 designates a species of humanoid', 'white', 55);
+                        await typeLine('antimemetic predator. Instances present as unremarkable', 'white', 55);
+                        await typeLine('personnel. No security pass. No employment record.', 'white', 55);
+                        await typeLine('Nobody remembers hiring them. Nobody looks twice.', 'white', 55);
+                        putLine('');
+                        await typeLine('An instance isolates its target from the perception', 'white', 55);
+                        await typeLine('of others, then consumes memory, identity, and', 'white', 55);
+                        await sleep(1200);
+                        await typeLine('COUNTERMEASURES: instances metabolize structured', 'white', 55);
+                        await typeLine('information. Saturation with high-entropy data (see', 'white', 55);
+                        await typeLine('incident report: seven hundred gigabytes of the', 'white', 55);
+                        await typeLine('digits of pi) has proven', 'white', 55);
+                        await sleep(1000);
+                        await typeLine('[FILE ENDS]', 'red', 40);
+                        putLine('');
+                        await sleep(900);
+                        await typeLine('note: file author no longer on record.', 'dim', 25);
+                },
 
-    'help': async () => {
-      await typeLine('there is no help.', 'dim', 25);
-},
+                '7381': async () => {
+                        await header('FILE U-7381');
+                        await typeLine('ITEM #: U-7381', 'green', 80);
+                        await typeLine('CLASS: OBJECT / CONFISCATED', 'green', 80);
+                        await typeLine('STORAGE: ARMORY LOCKER 12, UO WYELEIGH', 'green', 80);
+                        putLine('');
+                        await typeLine('DESCRIPTION: U-7381 is a handheld directed-energy', 'white', 55);
+                        await typeLine('weapon ("ray gun") of non-human manufacture.', 'white', 55);
+                        putLine('');
+                        await typeLine('Origin: unknown.', 'white', 55);
+                        await typeLine('Previous owner: unknown.', 'white', 55);
+                        await typeLine('Reason for confiscation: unknown.', 'white', 55);
+                        putLine('');
+                        await typeLine('It works.', 'white', 45);
+                        putLine('');
+                        await sleep(1200);
+                        await typeLine('NOTE: checked out by M. QUINN.', 'amber', 40);
+                        await sleep(700);
+                        await typeLine('not returned.', 'dim', 25);
+                },
 
-    'hello': async () => {
-      await typeLine('nobody is here.', 'dim', 25);
-},
+                '9429': async () => {
+                        await header('FILE U-9429');
+                        await typeLine('ITEM #: U-9429', 'green', 80);
+                        await typeLine('CLASS: STATIONARY / MEMORIAL', 'green', 80);
+                        await typeLine('LOCATION: [YOU HAVE WALKED PAST IT]', 'amber', 80);
+                        putLine('');
+                        await typeLine('DESCRIPTION: U-9429 is a monumental stone structure', 'white', 55);
+                        await typeLine('surrounded by a strong antimemetic clouding effect.', 'white', 55);
+                        await typeLine('It predates all surviving records. Most visitors', 'white', 55);
+                        await typeLine('forget it while standing on its steps.', 'white', 55);
+                        putLine('');
+                        await typeLine('U-9429 is a memorial. It commemorates a culture', 'white', 55);
+                        await typeLine('erased in its entirety by a Category Epsilon lethal', 'white', 55);
+                        await typeLine('idea complex. Population at time of event: unknown.', 'white', 55);
+                        await typeLine('Survivors: none. Name: gone.', 'white', 55);
+                        putLine('');
+                        await typeLine('They could not defend themselves, because they', 'white', 55);
+                        await typeLine('could not know what was happening to them.', 'white', 55);
+                        putLine('');
+                        await sleep(1400);
+                        await typeLine('someone has to remember.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('today it is you.', 'dim', 25);
+                },
 
-    'clear': async () => {
-      clearScreen();
-      newPromptLine();
-},
+                'quinn': async () => {
+                        await header('PERSONNEL FILE');
+                        await typeLine('QUINN, MARIE', 'green', 60);
+                        await typeLine('ANTIMEMETICS DIVISION - CHIEF', 'green', 60);
+                        putLine('');
+                        const s = span('STATUS: ', 'white');
+                        screen.appendChild(s);
+                        const st = span('', 'amber');
+                        screen.appendChild(st);
+                        scrollBottom();
+                        const states = ['ACTIVE', 'DECEASED', 'ACTIVE', 'DECEASED', 'ASCENDED', '[UNRESOLVED]'];
+                        for (const t of states) {
+                                  st.textContent = t;
+                                  await sleep(650);
+                        }
+                        putLine('');
+                        putLine('');
+                        await typeLine('she is still winning.', 'dim', 25);
+                },
+                'marie': async () => handlers['quinn'](),
+                'marie quinn': async () => handlers['quinn'](),
 
-    'credits': async () => {
-      await typeLine('SCP-055, SCP-2256, SCP-3125 and the Antimemetics', 'dim', 40);
-      await typeLine('Division originate from the SCP Foundation wiki and', 'dim', 40);
-      await typeLine('the work of qntm (Sam Hughes). CC BY-SA 3.0.', 'dim', 40);
-      await typeLine('This is an unofficial fan work. Read the book.', 'dim', 40);
-},
-};
+                'adam': async () => {
+                        await header('PERSONNEL FILE');
+                        await typeLine('QUINN, ADAM', 'green', 60);
+                        await typeLine('CIVILIAN - VIOLINIST', 'green', 60);
+                        await typeLine('STATUS: PROTECTED', 'amber', 60);
+                        putLine('');
+                        await typeLine('CLEARANCE: NONE.', 'white', 50);
+                        await typeLine('KNOWLEDGE OF ORGANISATION: NONE.', 'white', 50);
+                        await typeLine('KNOWLEDGE OF SPOUSE: [ROUTINELY ADJUSTED]', 'white', 50);
+                        putLine('');
+                        await sleep(1200);
+                        await typeLine('he waited.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('forget you read this.', 'dim', 25);
+                },
 
-  async function redactWords(lineEl) {
-    const text = lineEl.textContent.replace(/\n$/, '');
-    const words = text.split(' ');
-    lineEl.textContent = '';
-    const parts = words.map((w, i) => {
-      const p = span(w + (i < words.length - 1 ? ' ' : ''), lineEl.className);
-      lineEl.appendChild(p);
-      return p;
-});
-    lineEl.appendChild(span('\n'));
-    const order = parts.map((_, i) => i).sort(() => Math.random() - 0.5);
-    for (const i of order) {
-      const p = parts[i];
-      const len = p.textContent.trimEnd().length;
-      p.textContent = '█'.repeat(len) + (p.textContent.endsWith(' ') ? ' ' : '');
-      p.className = 'redact';
-      await sleep(70);
-}
-}
+                'hix': async () => {
+                        await header('PERSONNEL FILE');
+                        await typeLine('HIX, ED', 'green', 60);
+                        await typeLine('ENGINEERING', 'green', 60);
+                        await typeLine('LOCATION: VAULT B30-000', 'amber', 60);
+                        putLine('');
+                        await typeLine('CURRENT ASSIGNMENT: [UNTITLED MACHINE]', 'white', 50);
+                        await typeLine('STATUS: BUILDING', 'white', 50);
+                        await typeLine('MISSING COMPONENT: ONE (1) IDEA', 'white', 50);
+                        putLine('');
+                        await sleep(1200);
+                        await typeLine('do not disturb him. he is thinking.', 'dim', 25);
+                },
+                'ed hix': async () => handlers['hix'](),
 
-  boot();
-})();
-</script>
-</body>
+                'lee': async () => {
+                        await header('PERSONNEL FILE');
+                        await typeLine('LEE, SIMON', 'green', 60);
+                        await typeLine('ANTIMEMETICS DIVISION - RESEARCHER / INSTRUCTOR', 'green', 60);
+                        putLine('');
+                        await typeLine('YEARS OF SERVICE: 13', 'white', 50);
+                        await typeLine('FIRST DAY: TOMORROW', 'white', 50);
+                        putLine('');
+                        await sleep(1200);
+        await typeLine('welcome back, simon. again.', 'dim', 25);
+                },
+                'simon': async () => handlers['lee'](),
+                'simon lee': async () => handlers['lee'](),
+
+                'hilton': async () => {
+                        await header('PERSONNEL FILE');
+                        await typeLine('HILTON, ANDREW (DR.)', 'green', 60);
+                        await typeLine('ANTIMEMETICS DIVISION - FOUNDER', 'green', 60);
+                        putLine('');
+                        const s = span('STATUS: ', 'white');
+                        screen.appendChild(s);
+                        const st = span('', 'amber');
+                        screen.appendChild(st);
+                        scrollBottom();
+                        const states = ['RETIRED', 'RECALLED', '[LOST]'];
+                        for (const t of states) {
+                                  st.textContent = t;
+                                  await sleep(750);
+                        }
+                        putLine('');
+                        putLine('');
+                        await typeLine('he remembered everything, at the end.', 'dim', 25);
+                },
+
+                'wheeler': async () => {
+                        await sleep(600);
+                        await typeLine('there is no one here by that name.', 'dim', 25);
+                        await sleep(1400);
+                        await typeLine('...anymore.', 'dim', 18);
+                },
+                'marion': async () => handlers['wheeler'](),
+                'marion wheeler': async () => handlers['wheeler'](),
+
+                'cela': async () => {
+                        await sleep(600);
+                        await typeLine('she is fine.', 'dim', 25);
+                        await typeLine('she adapted.', 'dim', 25);
+                        await sleep(900);
+                        await typeLine('listen: her family is singing, out past the horizon.', 'dim', 25);
+                },
+
+                'mnestic': async () => {
+                        await typeLine('CLASS-W MNESTIC: sustained-release, low dosage.', 'white', 45);
+                        await typeLine('You will remember everything, forever.', 'white', 45);
+                        await typeLine('This is less pleasant than it sounds.', 'dim', 35);
+                },
+                'mnestics': async () => handlers['mnestic'](),
+
+                'unknowns': async () => {
+                        await typeLine('if there were an index, this would be it.', 'dim', 25);
+                },
+                'list': async () => handlers['unknowns'](),
+                'index': async () => handlers['unknowns'](),
+
+                'help': async () => {
+                        await typeLine('there is no help.', 'dim', 25);
+                },
+
+                'hello': async () => {
+                        await typeLine('nobody is here.', 'dim', 25);
+                },
+
+                'clear': async () => {
+                        clearScreen();
+                        newPromptLine();
+                },
+
+                'credits': async () => {
+                        await typeLine('an unofficial fan work inspired by', 'dim', 40);
+                        await typeLine('THERE IS NO ANTIMEMETICS DIVISION by qntm (Sam Hughes).', 'dim', 40);
+                        await typeLine('concepts originating on the SCP Foundation wiki are', 'dim', 40);
+                        await typeLine('CC BY-SA 3.0, as is this page.', 'dim', 40);
+                        await typeLine('read the book. while you still remember it exists.', 'dim', 40);
+                },
+          };
+
+          async function redactWords(lineEl) {
+                const text = lineEl.textContent.replace(/\n$/, '');
+                const words = text.split(' ');
+                lineEl.textContent = '';
+                const parts = words.map((w, i) => {
+                        const p = span(w + (i < words.length - 1 ? ' ' : ''), lineEl.className);
+                        lineEl.appendChild(p);
+                        return p;
+                });
+                lineEl.appendChild(span('\n'));
+                const order = parts.map((_, i) => i).sort(() => Math.random() - 0.5);
+                for (const i of order) {
+                        const p = parts[i];
+                        const len = p.textContent.trimEnd().length;
+                        p.textContent = '█'.repeat(len) + (p.textContent.endsWith(' ') ? ' ' : '');
+                        p.className = 'redact';
+                        await sleep(70);
+                }
+          }
+
+          boot();
+      })();
+    </script>
+  </body>
 </html>
