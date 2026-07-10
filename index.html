@@ -87,12 +87,10 @@
   <body>
     <script>
       (() => {
-          // ---------- testable indirection ----------
           const rnd = () => Math.random();
           const nowMs = () => Date.now();
           const localNow = () => new Date();
 
-          // ---------- DOM ----------
           const crt = document.createElement('div');
           crt.id = 'crt';
           document.body.appendChild(crt);
@@ -102,11 +100,9 @@
 
           const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-          // ---------- persistence (fails silently in private modes) ----------
           function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
           function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
 
-          // ---------- drift flags (rolled once per visit, in fixed order) ----------
           const drift = {
                 flickerConnect: rnd() < (1 / 15),
                 mandelaVerified: rnd() < (1 / 40),
@@ -118,7 +114,6 @@
           };
           const hesitateAtKey = 2 + Math.floor(rnd() * 7);
 
-          // ---------- favicon drift ----------
           if (drift.favicon) {
                 const link = document.createElement('link');
                 link.rel = 'icon';
@@ -128,7 +123,6 @@
                 document.head.appendChild(link);
           }
 
-          // ---------- output primitives ----------
           let cursorEl = null;
 
           function makeCursor() {
@@ -169,7 +163,6 @@
                 skipTyping = false;
           }
 
-          // ---------- monthly aging ----------
           function monthIndex() {
                 const d = localNow();
                 return d.getFullYear() * 12 + d.getMonth();
@@ -190,7 +183,6 @@
                 'No one is sure we still have it. No one remembers',
               ][monthIndex() % 3];
 
-          // ---------- boot ----------
           const bootLines = [
                 ['UO SECURE TERMINAL v4.7.1', '', 120],
                 ['UNKNOWN ORGANISATION. WE KEEP WHAT CANNOT BE KEPT.', '', 40],
@@ -293,7 +285,6 @@
                 startTerminal();
           }
 
-          // ---------- terminal ----------
           let inputSpan = null;
           let buffer = '';
           let accepting = false;
@@ -303,6 +294,7 @@
           let idleFired = false;
           let keyCount = 0;
           let inputMode = null;
+          let queriesThisSession = 0;
 
           function newPromptLine() {
                 inputSpan = span('', 'white');
@@ -422,6 +414,7 @@
                 }
 
                 const cmd = normalize(raw);
+                if (raw) queriesThisSession++;
 
                 if (!raw) {
                 } else if (handlers[cmd]) {
@@ -473,7 +466,6 @@
                 lsSet('uo_lastfile_at', String(nowMs()));
           }
 
-          // ---------- U-4512 recovered fragment ----------
           async function fragmentContinue(yes) {
                 putLine('');
                 if (!yes) {
@@ -503,7 +495,6 @@
                 await typeLine('NOT [DATA LOST]', 'amber', 40);
           }
 
-          // ---------- Vault B30-000 ----------
           async function b30ReceiveIdea(raw) {
                 const idea = (raw || '').slice(0, 200);
                 lsSet('uo_b30_idea', idea || '(nothing)');
@@ -535,7 +526,6 @@
                 await typeLine('forget you were here.', 'dim', 25);
           }
 
-          // ---------- handlers ----------
           const handlers = {
 
                 '55': async () => {
@@ -920,8 +910,18 @@
                 },
 
                 'vault601': async () => {
-                        await sleep(800);
-                        await typeLine('VAULT 601. INVERTED CONTAINMENT.', 'dim', 40);
+                        await header('VAULT 601 - SCHEMATIC (AS BUILT)');
+                        putLine('  ┌───────────────────────┐', 'white');
+                        putLine('  │                       │', 'white');
+                        putLine('  │                       │', 'white');
+                        putLine('  │      [ NOTHING ]      │', 'white');
+                        putLine('  │                       │', 'white');
+                        putLine('  │                       │', 'white');
+                        putLine('  └───────────┬───────────┘', 'white');
+                        putLine('              │ door (opens inward)', 'white');
+                        putLine('');
+                        await sleep(1200);
+                        await typeLine('contents: none. that is the point.', 'white', 40);
                         putLine('');
                         await typeLine('you are already inside it.', 'white', 30);
                         await sleep(700);
@@ -954,6 +954,194 @@
                 'vault b30': async () => handlers['b30'](),
                 'vault b30-000': async () => handlers['b30'](),
 
+                'blackriver': async () => {
+                        await header('FACILITY RECORD');
+                        await typeLine('UO PRIMARY ARCHIVE FACILITY - BLACK RIVER', 'green', 60);
+                        await typeLine('LEVEL -3 (PARTIAL)', 'green', 60);
+                        putLine('');
+                        putLine('  ┌─────────┬─────────┬─────────┐', 'white');
+                        putLine('  │ ARCHIVE │ ARCHIVE │  CCTV   │', 'white');
+                        putLine('  │    A    │    B    │  ROOM   │', 'white');
+                        putLine('  ├─────────┼─────────┼─────────┤', 'white');
+                        putLine('  │  VAULT  │         │  MESS   │', 'white');
+                        putLine('  │  3011A  │         │  HALL   │', 'white');
+                        putLine('  └─────────┴─────────┴─────────┘', 'white');
+                        putLine('');
+                        await sleep(1400);
+                        await typeLine('all rooms are labelled.', 'dim', 25);
+                },
+                'black river': async () => handlers['blackriver'](),
+
+                'incident': async () => {
+                        await header('INCIDENT REPORTS');
+                        await typeLine('INCIDENT REPORTS: 118 AVAILABLE.', 'white', 45);
+                        await sleep(900);
+                        await typeLine('117 UNREADABLE.', 'amber', 45);
+                        putLine('');
+                        await sleep(1100);
+                        await typeLine('DISPLAYING READABLE REPORTS (1):', 'dim', 30);
+                        putLine('');
+                        await typeLine('  IR-0034: nothing happened.', 'white', 40);
+                        await typeLine('  everyone agrees nothing happened.', 'white', 40);
+                        await typeLine('  report filed anyway. filer unknown.', 'white', 40);
+                },
+                'incidents': async () => handlers['incident'](),
+
+                'horizon': async () => {
+                        await header('ACOUSTIC LOG');
+                        await typeLine('LISTENING POST 9 - SOUTH PACIFIC', 'green', 60);
+                        await typeLine('PASSIVE ARRAY - TRANSLATED (PARTIAL)', 'green', 60);
+                        putLine('');
+                        await typeLine('04:11  [call, long-form] ......... "still here"', 'white', 45);
+                        await typeLine('04:26  [response, distant] ....... "still here"', 'white', 45);
+                        await typeLine('04:58  [chorus, five voices] ..... "the horizon holds"', 'white', 45);
+                        await typeLine('05:44  [juvenile, first call] .... [untranslatable]', 'white', 45);
+                        putLine('');
+                        await sleep(1300);
+                        await typeLine('analyst note: the last entry may be a name.', 'dim', 25);
+                        await sleep(900);
+                        await typeLine('we no longer observe them. they seem to prefer it.', 'dim', 25);
+                },
+
+                'mnestic-w': async () => {
+                        await header('PHARMACEUTICAL SPECIFICATION');
+                        await typeLine('CLASS-W MNESTIC - SUSTAINED RELEASE', 'green', 60);
+                        putLine('');
+                        await typeLine('FORM: tablet, white, unmarked.', 'white', 50);
+                        await typeLine('DOSE: one daily. do not double after a missed day.', 'white', 50);
+                        await typeLine('you will not know you missed a day.', 'white', 50);
+                        putLine('');
+                        await typeLine('EFFECT: retention of antimemetic material.', 'white', 50);
+                        await typeLine('SIDE EFFECTS: retention of everything else.', 'white', 50);
+                        putLine('');
+                        await typeLine('CONTRAINDICATIONS: do not take if you have ever', 'white', 50);
+                        await typeLine('been someone else.', 'white', 50);
+                        putLine('');
+                        await sleep(1200);
+                        await typeLine('supply is not the problem. wanting to keep taking it is.', 'dim', 25);
+                },
+                'mnestic w': async () => handlers['mnestic-w'](),
+                'class-w': async () => handlers['mnestic-w'](),
+                'class w': async () => handlers['mnestic-w'](),
+
+                'clearance': async () => {
+                        await header('CLEARANCE REFERENCE');
+                        await typeLine('MNESTIC CLEARANCE LEVELS', 'green', 60);
+                        putLine('');
+                        await typeLine('LEVEL 0: you have already forgotten this document.', 'white', 50);
+                        await typeLine('LEVEL 1: retains the Division for one briefing.', 'white', 50);
+                        await typeLine('LEVEL 2: retains the Division between briefings.', 'white', 50);
+                        await typeLine('         reports headaches.', 'white', 50);
+                        await typeLine('LEVEL 3: remembers what the Division is for.', 'white', 50);
+                        await typeLine('         do not envy them.', 'white', 50);
+                        await typeLine('LEVEL 4: [record exceeds your clearance]', 'amber', 50);
+                        await typeLine('LEVEL 5: there is no level 5.', 'white', 50);
+                },
+
+                'orientation': async () => {
+                        await header('ORIENTATION PACKET');
+                        await typeLine('WELCOME TO THE UNKNOWN ORGANISATION', 'green', 60);
+                        await typeLine('NEW PERSONNEL ORIENTATION', 'green', 60);
+                        putLine('');
+                        await typeLine('PAGE 1: you have worked here for some time.', 'white', 50);
+                        await typeLine('PAGE 2: your badge photo is older than you think.', 'white', 50);
+                        await typeLine('        do not look closely at it.', 'white', 50);
+                        await typeLine('PAGE 3: in a memory emergency, stay where you are.', 'white', 50);
+                        await typeLine('        someone who remembers you will come.', 'white', 50);
+                        await typeLine('PAGE 5: welcome aboard. again.', 'white', 50);
+                        putLine('');
+                        await sleep(1300);
+                        await typeLine('we do not discuss page 4.', 'dim', 25);
+                },
+
+                'directory': async () => {
+                        await header('INTERNAL DIRECTORY');
+                        await typeLine('UO DEPARTMENTS - 47 LISTED', 'green', 60);
+                        putLine('');
+                        await typeLine('  PHYSICAL CONTAINMENT', 'white', 60);
+                        await typeLine('  MEMETICS', 'white', 60);
+                        await typeLine('  NOOSPHERICS', 'white', 60);
+                        await typeLine('  ARCHIVES (BLACK RIVER)', 'white', 60);
+                        await typeLine('  HEAVY ENGINEERING', 'white', 60);
+                        await typeLine('  PHARMACOLOGY', 'white', 60);
+                        await typeLine('  ██████████████ DIVISION', 'white', 60);
+                        await typeLine('  PAYROLL', 'white', 60);
+                        await typeLine('  MAINTENANCE', 'white', 60);
+                        await typeLine('  (38 more)', 'dim', 60);
+                        putLine('');
+                        await sleep(1100);
+                        await typeLine('one entry could not be rendered. this is normal.', 'dim', 25);
+                },
+
+                'verify': async () => {
+                        await typeLine('MNESTIC CLEARANCE ............. VERIFYING', 'white', 45);
+                        await sleep(1600);
+                        if (lsGet('uo_verified')) {
+                                  await typeLine('MNESTIC CLEARANCE ............. VERIFIED', 'green', 45);
+                        } else {
+                                  await typeLine('MNESTIC CLEARANCE ............. UNVERIFIED', 'amber', 45);
+                                  await sleep(800);
+                                  await typeLine('this is normal.', 'dim', 25);
+                        }
+                },
+
+                'whoami': async () => {
+                        await sleep(800);
+                        const name = lsGet('uo_b30_name');
+                        if (name) {
+                                  await typeLine(name + '.', 'white', 25);
+                                  await sleep(1100);
+                                  await typeLine('probably.', 'dim', 22);
+                        } else {
+                                  await typeLine('unknown.', 'white', 25);
+                                  await sleep(1100);
+                                  await typeLine('fitting.', 'dim', 22);
+                        }
+                },
+
+                'status': async () => {
+                        await typeLine('ARCHIVE STATUS', 'green', 60);
+                        putLine('');
+                        await typeLine('  files indexed ........... [MISMATCH]', 'white', 50);
+                        await typeLine('  files present ........... fewer', 'white', 50);
+                        await typeLine('  information decay ....... ONGOING', 'white', 50);
+                        await typeLine('  containment ............. HOLDING', 'white', 50);
+                        await typeLine('  division ................ NO SUCH DIVISION', 'amber', 50);
+                        putLine('');
+                        await typeLine('  queries this session .... ' + queriesThisSession, 'white', 50);
+                        await typeLine('  queries recorded ........ 0', 'white', 50);
+                },
+
+                'logout': async () => {
+                        await sleep(900);
+                        await typeLine('ending session...', 'dim', 25);
+                        await sleep(1100);
+                        await typeLine('no session found.', 'white', 30);
+                        await sleep(700);
+                        await typeLine('you were never logged in.', 'dim', 25);
+                },
+
+                'override': async () => {
+                        await sleep(800);
+                        await typeLine('OVERRIDE REQUIRES: something to override.', 'white', 40);
+                        await sleep(900);
+                        await typeLine('none found.', 'dim', 25);
+                },
+
+                'vault': async () => {
+                        await sleep(800);
+                        await typeLine('which vault?', 'white', 30);
+                        putLine('');
+                        await typeLine('  601 is empty. that is the point.', 'dim', 30);
+                        await typeLine('  B30-000 is busy. do not disturb.', 'dim', 30);
+                        await typeLine('  the rest are not vaults.', 'dim', 30);
+                },
+
+                'history': async () => {
+                        await sleep(1000);
+                        await typeLine('No previous session exists.', 'white', 30);
+                },
+
                 'mnestic': async () => {
                         await typeLine('CLASS-W MNESTIC: sustained-release, low dosage.', 'white', 45);
                         await typeLine('You will remember everything, forever.', 'white', 45);
@@ -967,7 +1155,7 @@
                                   await typeLine('remember who?', 'dim', 22);
                         } else {
                                   await typeLine('remember what?', 'dim', 22);
-                                       }
+                        }
                 },
 
                 'forget': async () => {
@@ -1013,7 +1201,6 @@
                 },
           };
 
-          // ---------- self-redaction ----------
           async function redactWords(lineEl) {
                 const text = lineEl.textContent.replace(/\n$/, '');
                 const words = text.split(' ');
