@@ -906,6 +906,19 @@
                         await typeLine('Please leave quietly.', 'dim', 25);
                 },
 
+                '55555': async () => {
+                        await sleep(700);
+                        await typeLine('Legacy authentication detected.', 'white', 30);
+                        await sleep(900);
+                        await typeLine('Migrating...', 'dim', 30);
+                        await sleep(1400);
+                        await typeLine('Migration failed.', 'amber', 30);
+                        putLine('');
+                        await sleep(700);
+                        await typeLine('Reason:', 'dim', 25);
+                        await typeLine('No surviving records.', 'dim', 25);
+                },
+
                 'quinn': async () => {
                         await header('PERSONNEL FILE');
                         await typeLine('QUINN, MARIE', 'green', 60);
