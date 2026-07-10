@@ -519,12 +519,11 @@
                 lsSet('uo_b30_idea', idea || '(nothing)');
                 putLine('');
                 await sleep(700);
-                if (!idea) {
-                        await typeLine('that is also an idea.', 'dim', 25);
-                }
-                await typeLine('received.', 'dim', 25);
+                await typeLine('contribution recorded.', 'dim', 25);
+                await sleep(700);
+                await typeLine('estimated completion remains unchanged.', 'dim', 25);
                 await sleep(900);
-                await typeLine('and who should it remember?', 'dim', 25);
+                await typeLine('identity confirmation is optional.', 'dim', 25);
                 putLine('');
                 inputMode = 'b30name';
                 newPromptLine();
@@ -538,11 +537,9 @@
                 }
                 putLine('');
                 await sleep(700);
-                await typeLine('thank you.', 'dim', 25);
-                await sleep(700);
-                await typeLine('he says he is close.', 'dim', 25);
+                await typeLine('identity confirmation stored.', 'dim', 25);
                 await sleep(900);
-                await typeLine('forget you were here.', 'dim', 25);
+                await typeLine('thank you.', 'dim', 25);
           }
 
           const handlers = {
@@ -912,10 +909,9 @@
                 'quinn': async () => {
                         await header('PERSONNEL FILE');
                         await typeLine('QUINN, MARIE', 'green', 60);
-                        await typeLine('ANTIMEMETICS DIVISION - CHIEF', 'green', 60);
+                        await typeLine('DIVISION CHIEF', 'green', 60);
                         putLine('');
-                        const s = span('STATUS: ', 'white');
-                        screen.appendChild(s);
+                        await typeLine('STATUS:', 'white', 60);
                         const st = span('', 'amber');
                         screen.appendChild(st);
                         scrollBottom();
@@ -926,19 +922,37 @@
                         }
                         putLine('');
                         putLine('');
-                        await typeLine('she is still winning.', 'dim', 25);
+                        await typeLine('CLEARANCE:', 'white', 50);
+                        await typeLine('LEVEL 4', 'white', 50);
+                        putLine('');
+                        await typeLine('SERVICE RECORD:', 'white', 50);
+                        await typeLine('CURRENT', 'white', 50);
+                        putLine('');
+                        await sleep(900);
+                        await typeLine('personnel are reminded that status and availability', 'dim', 30);
+                        await typeLine('should not be treated as equivalent.', 'dim', 30);
                 },
                 'marie': async () => handlers['quinn'](),
                 'marie quinn': async () => handlers['quinn'](),
 
                 'quinn remembers': async () => {
+                        await sleep(1200);
+                        await typeLine('MNESTIC VERIFICATION', 'green', 45);
+                        putLine('');
+                        await typeLine('Subject:', 'white', 30);
+                        await typeLine('QUINN, MARIE', 'white', 30);
+                        putLine('');
+                        await typeLine('Retention Event:', 'white', 30);
+                        await typeLine('Confirmed.', 'white', 30);
+                        putLine('');
                         await sleep(1500);
                         await typeLine('she does.', 'dim', 22);
                         await sleep(1100);
                         await typeLine('at the end, she remembered everything.', 'dim', 22);
                         await sleep(1800);
                         putLine('');
-                        await typeLine('COMPONENT RECOVERED: ONE (1) IDEA', 'green', 45);
+                        await typeLine('COMPONENT RECOVERED:', 'green', 45);
+                        await typeLine('ONE (1) IDEA', 'green', 45);
                         putLine('');
                         await sleep(1000);
                         await typeLine('you are not alone.', 'white', 30);
@@ -951,6 +965,8 @@
                         await typeLine('MNESTIC CLEARANCE ............. VERIFIED', 'green', 50);
                         putLine('');
                         await sleep(900);
+                        await typeLine('this record supersedes all previous versions.', 'dim', 22);
+                        await sleep(900);
                         await typeLine('it will remember that you remembered.', 'dim', 22);
                         lsSet('uo_verified', '1');
                 },
@@ -958,55 +974,74 @@
                 'adam': async () => {
                         await header('PERSONNEL FILE');
                         await typeLine('QUINN, ADAM', 'green', 60);
-                        await typeLine('CIVILIAN - VIOLINIST', 'green', 60);
-                        await typeLine('STATUS: PROTECTED', 'amber', 60);
+                        await typeLine('CIVILIAN', 'green', 60);
                         putLine('');
-                        await typeLine('CLEARANCE: NONE.', 'white', 50);
-                        await typeLine('KNOWLEDGE OF ORGANISATION: NONE.', 'white', 50);
-                        await typeLine('KNOWLEDGE OF SPOUSE: [ROUTINELY ADJUSTED]', 'white', 50);
+                        await typeLine('OCCUPATION:', 'white', 50);
+                        await typeLine('VIOLINIST', 'white', 50);
+                        putLine('');
+                        await typeLine('CLEARANCE:', 'white', 50);
+                        await typeLine('NONE', 'white', 50);
+                        putLine('');
+                        await typeLine('KNOWLEDGE OF ORGANISATION:', 'white', 50);
+                        await typeLine('NONE', 'white', 50);
                         putLine('');
                         await sleep(1200);
-                        await typeLine('he waited.', 'dim', 25);
+                        await typeLine('protective cognitive maintenance remains', 'dim', 25);
+                        await typeLine('authorised.', 'dim', 25);
                         await sleep(700);
-                        await typeLine('forget you read this.', 'dim', 25);
+                        await typeLine('no further action required.', 'dim', 25);
                 },
 
                 'hix': async () => {
                         await header('PERSONNEL FILE');
                         await typeLine('HIX, ED', 'green', 60);
-                        await typeLine('ENGINEERING', 'green', 60);
-                        await typeLine('LOCATION: VAULT B30-000', 'amber', 60);
+                        await typeLine('HEAVY ENGINEERING', 'green', 60);
                         putLine('');
-                        await typeLine('CURRENT ASSIGNMENT: [UNTITLED MACHINE]', 'white', 50);
-                        await typeLine('STATUS: BUILDING', 'white', 50);
-                        await typeLine('MISSING COMPONENT: ONE (1) IDEA', 'white', 50);
+                        await typeLine('LOCATION:', 'white', 50);
+                        await typeLine('VAULT B30-000', 'white', 50);
+                        putLine('');
+                        await typeLine('CURRENT PROJECT:', 'white', 50);
+                        await typeLine('UNDECLARED', 'white', 50);
+                        putLine('');
+                        await typeLine('STATUS:', 'white', 50);
+                        await typeLine('IN PROGRESS', 'white', 50);
+                        putLine('');
+                        await typeLine('MISSING COMPONENTS:', 'white', 50);
+                        await typeLine('ONE (1) IDEA', 'white', 50);
                         putLine('');
                         await sleep(1200);
-                        await typeLine('do not disturb him. he is thinking.', 'dim', 25);
+                        await typeLine('interruptions require written justification.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('priority requests have not altered completion', 'dim', 25);
+                        await typeLine('estimates.', 'dim', 25);
                 },
                 'ed hix': async () => handlers['hix'](),
 
                 'lee': async () => {
                         await header('PERSONNEL FILE');
                         await typeLine('LEE, SIMON', 'green', 60);
-                        await typeLine('ANTIMEMETICS DIVISION - RESEARCHER / INSTRUCTOR', 'green', 60);
+                        await typeLine('RESEARCH DIVISION', 'green', 60);
                         putLine('');
-                        await typeLine('YEARS OF SERVICE: 13', 'white', 50);
-                        await typeLine('FIRST DAY: TOMORROW', 'white', 50);
+                        await typeLine('YEARS OF SERVICE:', 'white', 50);
+                        await typeLine('13', 'white', 50);
+                        putLine('');
+                        await typeLine('FIRST DAY:', 'white', 50);
+                        await typeLine('TOMORROW', 'white', 50);
                         putLine('');
                         await sleep(1200);
-                        await typeLine('welcome back, simon. again.', 'dim', 25);
+                        await typeLine('personnel records remain internally consistent.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('operational records do not.', 'dim', 25);
                 },
                 'simon': async () => handlers['lee'](),
                 'simon lee': async () => handlers['lee'](),
 
                 'hilton': async () => {
                         await header('PERSONNEL FILE');
-                        await typeLine('HILTON, ANDREW (DR.)', 'green', 60);
-                        await typeLine('ANTIMEMETICS DIVISION - FOUNDER', 'green', 60);
+                        await typeLine('HILTON, ANDREW', 'green', 60);
+                        await typeLine('FOUNDING DIRECTOR', 'green', 60);
                         putLine('');
-                        const s = span('STATUS: ', 'white');
-                        screen.appendChild(s);
+                        await typeLine('STATUS:', 'white', 60);
                         const st = span('', 'amber');
                         screen.appendChild(st);
                         scrollBottom();
@@ -1017,62 +1052,78 @@
                         }
                         putLine('');
                         putLine('');
-                        await typeLine('he remembered everything, at the end.', 'dim', 25);
+                        await typeLine('FOUNDING DIRECTIVE:', 'white', 50);
+                        await typeLine('REMAINS IN EFFECT', 'white', 50);
+                        putLine('');
+                        await sleep(1000);
+                        await typeLine('subsequent amendments have not reduced the amount', 'dim', 25);
+                        await typeLine('of paperwork.', 'dim', 25);
                 },
 
                 'wheeler': async () => {
                         await sleep(600);
-                        await typeLine('there is no one here by that name.', 'dim', 25);
+                        await typeLine('no personnel record exists.', 'dim', 25);
                         await sleep(1400);
-                        await typeLine('...anymore.', 'dim', 18);
+                        await typeLine('historical references remain under review.', 'dim', 18);
                 },
                 'marion': async () => handlers['wheeler'](),
                 'marion wheeler': async () => handlers['wheeler'](),
 
                 'cela': async () => {
                         await sleep(600);
-                        await typeLine('she is fine.', 'dim', 25);
-                        await typeLine('she adapted.', 'dim', 25);
+                        await typeLine('STATUS:', 'white', 30);
+                        await typeLine('ACTIVE', 'white', 30);
+                        putLine('');
+                        await typeLine('TRANSFER:', 'white', 30);
+                        await typeLine('COMPLETE', 'white', 30);
+                        putLine('');
                         await sleep(900);
-                        await typeLine('listen: her family is singing, out past the horizon.', 'dim', 25);
+                        await typeLine('further welfare enquiries are unnecessary.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('no concerns have been recorded.', 'dim', 25);
                 },
 
                 'vault601': async () => {
                         await header('VAULT 601 - SCHEMATIC (AS BUILT)');
-                        putLine('  ┌───────────────────────┐', 'white');
-                        putLine('  │                       │', 'white');
-                        putLine('  │                       │', 'white');
-                        putLine('  │      [ NOTHING ]      │', 'white');
-                        putLine('  │                       │', 'white');
-                        putLine('  │                       │', 'white');
-                        putLine('  └───────────┬───────────┘', 'white');
-                        putLine('              │ door (opens inward)', 'white');
+                        putLine('    ┌───────────────────────┐', 'white');
+                        putLine('    │                       │', 'white');
+                        putLine('    │                       │', 'white');
+                        putLine('    │      [ NOTHING ]      │', 'white');
+                        putLine('    │                       │', 'white');
+                        putLine('    │                       │', 'white');
+                        putLine('    └───────────┬───────────┘', 'white');
+                        putLine('                │', 'white');
                         putLine('');
                         await sleep(1200);
-                        await typeLine('contents: none. that is the point.', 'white', 40);
+                        await typeLine('CONTENTS:', 'white', 40);
+                        await typeLine('None.', 'white', 40);
                         putLine('');
-                        await typeLine('you are already inside it.', 'white', 30);
+                        await typeLine('inventory confirmed.', 'white', 30);
+                        putLine('');
                         await sleep(700);
-                        await typeLine('this is the only room where it is not.', 'white', 30);
+                        await typeLine('this remains the only location where U-3125 is', 'white', 30);
+                        await typeLine('not.', 'white', 30);
                         putLine('');
                         await sleep(1100);
-                        await typeLine('close the door on your way out.', 'dim', 25);
+                        await typeLine('please secure the door before departure.', 'dim', 25);
                 },
                 'vault 601': async () => handlers['vault601'](),
                 '601': async () => handlers['vault601'](),
 
                 'b30': async () => {
                         await header('VAULT B30-000');
-                        await typeLine('HEAVY ENGINEERING. AUTHORIZED PERSONNEL ONLY.', 'amber', 50);
+                        await typeLine('HEAVY ENGINEERING', 'amber', 50);
                         putLine('');
-                        await typeLine('the machine is here.', 'white', 40);
-                        await typeLine('it is almost finished. it has been almost finished', 'white', 40);
-                        await typeLine('for years.', 'white', 40);
+                        await typeLine('AUTHORISED PERSONNEL ONLY', 'amber', 50);
                         putLine('');
-                        await typeLine('it is missing one (1) component.', 'white', 40);
+                        await typeLine('PROJECT STATUS', 'white', 40);
+                        await typeLine('INCOMPLETE', 'white', 40);
+                        putLine('');
+                        await typeLine('MISSING COMPONENTS', 'white', 40);
+                        await typeLine('ONE (1) IDEA', 'white', 40);
                         putLine('');
                         await sleep(1000);
-                        await typeLine('leave an idea. it will not be wasted.', 'dim', 25);
+                        await typeLine('contribution requested.', 'dim', 25);
                         putLine('');
                         inputMode = 'b30idea';
                         newPromptLine();
@@ -1084,7 +1135,9 @@
 
                 'blackriver': async () => {
                         await header('FACILITY RECORD');
-                        await typeLine('UO PRIMARY ARCHIVE FACILITY - BLACK RIVER', 'green', 60);
+                        await typeLine('UO PRIMARY ARCHIVE FACILITY', 'green', 60);
+                        await typeLine('BLACK RIVER', 'green', 60);
+                        putLine('');
                         await typeLine('LEVEL -3 (PARTIAL)', 'green', 60);
                         putLine('');
                         putLine('  ┌─────────┬─────────┬─────────┐', 'white');
@@ -1097,59 +1150,104 @@
                         putLine('  └─────────┴─────────┴─────────┘', 'white');
                         putLine('');
                         await sleep(1400);
-                        await typeLine('all rooms are labelled.', 'dim', 25);
+                        await typeLine('facility survey verified.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('no discrepancies recorded.', 'dim', 25);
                 },
                 'black river': async () => handlers['blackriver'](),
 
                 'incident': async () => {
-                        await header('INCIDENT REPORTS');
-                        await typeLine('INCIDENT REPORTS: ' + (rnd() < 0.04 ? 119 : 118) + ' AVAILABLE.', 'white', 45);
+                        await header('INCIDENT REGISTER');
+                        await typeLine((rnd() < 0.04 ? 119 : 118) + ' REPORTS AVAILABLE.', 'white', 45);
                         await sleep(900);
                         await typeLine('117 UNREADABLE.', 'amber', 45);
                         putLine('');
                         await sleep(1100);
-                        await typeLine('DISPLAYING READABLE REPORTS (1):', 'dim', 30);
+                        await typeLine('DISPLAYING AVAILABLE REPORT:', 'dim', 30);
                         putLine('');
                         await typeLine('  IR-0034', 'white', 40);
                         putLine('');
-                        await typeLine('  SUMMARY: no incident occurred.', 'white', 40);
-                        await typeLine('  REASON REPORT FILED: required.', 'white', 40);
-                        await typeLine('  DISPOSITION: closed.', 'white', 40);
+                        await typeLine('  SUMMARY:', 'white', 40);
+                        await typeLine('  No incident occurred.', 'white', 40);
+                        putLine('');
+                        await typeLine('  ACTION TAKEN:', 'white', 40);
+                        await typeLine('  Report completed.', 'white', 40);
+                        putLine('');
+                        await typeLine('  STATUS:', 'white', 40);
+                        await typeLine('  Closed.', 'white', 40);
                 },
                 'incidents': async () => handlers['incident'](),
 
                 'horizon': async () => {
                         await header('ACOUSTIC LOG');
-                        await typeLine('LISTENING POST 9 - SOUTH PACIFIC', 'green', 60);
-                        await typeLine('PASSIVE ARRAY - TRANSLATED (PARTIAL)', 'green', 60);
+                        await typeLine('LISTENING POST 9', 'green', 60);
+                        await typeLine('SOUTH PACIFIC', 'green', 60);
                         putLine('');
-                        await typeLine('04:11  [call, long-form] ......... "still here"', 'white', 45);
-                        await typeLine('04:26  [response, distant] ....... "still here"', 'white', 45);
-                        await typeLine('04:58  [chorus, five voices] ..... "the horizon holds"', 'white', 45);
-                        await typeLine('05:44  [juvenile, first call] .... [untranslatable]', 'white', 45);
+                        await typeLine('PASSIVE ARRAY', 'green', 60);
+                        await typeLine('TRANSLATED TRANSCRIPT (PARTIAL)', 'green', 60);
+                        putLine('');
+                        await typeLine('04:11', 'white', 45);
+                        await typeLine('[CALL]', 'white', 45);
+                        await typeLine('"still here"', 'white', 45);
+                        putLine('');
+                        await typeLine('04:26', 'white', 45);
+                        await typeLine('[RESPONSE]', 'white', 45);
+                        await typeLine('"still here"', 'white', 45);
+                        putLine('');
+                        await typeLine('04:58', 'white', 45);
+                        await typeLine('[MULTIPLE SOURCES]', 'white', 45);
+                        await typeLine('"the horizon holds"', 'white', 45);
+                        putLine('');
+                        await typeLine('05:44', 'white', 45);
+                        await typeLine('[JUVENILE VOICE]', 'white', 45);
+                        await typeLine('[UNTRANSLATABLE]', 'white', 45);
                         putLine('');
                         await sleep(1300);
-                        await typeLine('analyst note: the last entry may be a name.', 'dim', 25);
+                        await typeLine('ANALYST NOTE:', 'dim', 25);
+                        putLine('');
+                        await typeLine('the final transmission may constitute a proper', 'dim', 25);
+                        await typeLine('name.', 'dim', 25);
+                        putLine('');
                         await sleep(900);
-                        await typeLine('we no longer observe them. they seem to prefer it.', 'dim', 25);
+                        await typeLine('observation has ceased.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('no request to resume has been submitted.', 'dim', 25);
                 },
 
                 'mnestic-w': async () => {
                         await header('PHARMACEUTICAL SPECIFICATION');
-                        await typeLine('CLASS-W MNESTIC - SUSTAINED RELEASE', 'green', 60);
+                        await typeLine('CLASS-W MNESTIC', 'green', 60);
                         putLine('');
-                        await typeLine('FORM: tablet, white, unmarked.', 'white', 50);
-                        await typeLine('DOSE: one daily. do not double after a missed day.', 'white', 50);
-                        await typeLine('you will not know you missed a day.', 'white', 50);
+                        await typeLine('FORM:', 'white', 50);
+                        await typeLine('Tablet.', 'white', 50);
+                        await typeLine('White.', 'white', 50);
+                        await typeLine('Unmarked.', 'white', 50);
                         putLine('');
-                        await typeLine('EFFECT: retention of antimemetic material.', 'white', 50);
-                        await typeLine('SIDE EFFECTS: retention of everything else.', 'white', 50);
+                        await typeLine('DOSAGE:', 'white', 50);
+                        await typeLine('One daily.', 'white', 50);
                         putLine('');
-                        await typeLine('CONTRAINDICATIONS: do not take if you have ever', 'white', 50);
-                        await typeLine('been someone else.', 'white', 50);
+                        await typeLine('missed doses should not be doubled.', 'white', 50);
+                        putLine('');
+                        await typeLine('you will not reliably remember whether a dose was', 'white', 50);
+                        await typeLine('missed.', 'white', 50);
+                        putLine('');
+                        await typeLine('EFFECT:', 'white', 50);
+                        putLine('');
+                        await typeLine('Retention of antimemetic material.', 'white', 50);
+                        putLine('');
+                        await typeLine('KNOWN SIDE EFFECTS:', 'white', 50);
+                        putLine('');
+                        await typeLine('Retention of unrelated material.', 'white', 50);
+                        putLine('');
+                        await typeLine('CONTRAINDICATIONS:', 'white', 50);
+                        putLine('');
+                        await typeLine('Do not administer to personnel with documented', 'white', 50);
+                        await typeLine('identity instability.', 'white', 50);
                         putLine('');
                         await sleep(1200);
-                        await typeLine('supply is not the problem. wanting to keep taking it is.', 'dim', 25);
+                        await typeLine('supply remains adequate.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('long-term compliance does not.', 'dim', 25);
                 },
                 'mnestic w': async () => handlers['mnestic-w'](),
                 'class-w': async () => handlers['mnestic-w'](),
@@ -1159,56 +1257,87 @@
                         await header('CLEARANCE REFERENCE');
                         await typeLine('MNESTIC CLEARANCE LEVELS', 'green', 60);
                         putLine('');
-                        await typeLine('LEVEL 0: you have already forgotten this document.', 'white', 50);
-                        await typeLine('LEVEL 1: retains the Division for one briefing.', 'white', 50);
-                        await typeLine('LEVEL 2: retains the Division between briefings.', 'white', 50);
-                        if (rnd() >= 0.04) {
-                                  await typeLine('         reports headaches.', 'white', 50);
-                        }
-                        await typeLine('LEVEL 3: remembers what the Division is for.', 'white', 50);
-                        await typeLine('         do not envy them.', 'white', 50);
-                        await typeLine('LEVEL 4: [record exceeds your clearance]', 'amber', 50);
-                        await typeLine('LEVEL 5: there is no level 5.', 'white', 50);
+                        await typeLine('LEVEL 0', 'white', 50);
+                        await typeLine('this document has already been forgotten.', 'white', 50);
+                        putLine('');
+                        await typeLine('LEVEL 1', 'white', 50);
+                        await typeLine('retains the Division until debrief.', 'white', 50);
+                        putLine('');
+                        await typeLine('LEVEL 2', 'white', 50);
+                        await typeLine('retains the Division between briefings.', 'white', 50);
+                        putLine('');
+                        await typeLine('LEVEL 3', 'white', 50);
+                        await typeLine('remembers what the Division is for.', 'white', 50);
+                        putLine('');
+                        await typeLine('LEVEL 4', 'amber', 50);
+                        await typeLine('record exceeds current clearance.', 'amber', 50);
+                        putLine('');
+                        await typeLine('LEVEL 5', 'white', 50);
+                        await typeLine('no such clearance exists.', 'white', 50);
+                        putLine('');
                         await sleep(800);
-                        await typeLine('personnel requesting clarification should resubmit', 'dim', 45);
-                        await typeLine('the request at the appropriate clearance level.', 'dim', 45);
+                        await typeLine('requests for clarification should be submitted', 'dim', 45);
+                        await typeLine('through the usual channels.', 'dim', 45);
                 },
 
                 'orientation': async () => {
                         await header('ORIENTATION PACKET');
-                        await typeLine('WELCOME TO THE UNKNOWN ORGANISATION', 'green', 60);
+                        await typeLine('UNKNOWN ORGANISATION', 'green', 60);
+                        putLine('');
                         await typeLine('NEW PERSONNEL ORIENTATION', 'green', 60);
                         putLine('');
-                        await typeLine('PAGE 1: you have worked here for some time.', 'white', 50);
-                        await typeLine('PAGE 2: your badge photo is older than you think.', 'white', 50);
-                        await typeLine('        do not look closely at it.', 'white', 50);
-                        await typeLine('PAGE 3: in a memory emergency, stay where you are.', 'white', 50);
-                        await typeLine('        someone who remembers you will come.', 'white', 50);
-                        await typeLine((rnd() < 0.04 ? 'PAGE 6' : 'PAGE 5') + ': welcome aboard. again.', 'white', 50);
+                        await typeLine('PAGE 1', 'white', 50);
+                        await typeLine('you have worked here longer than you remember.', 'white', 50);
+                        putLine('');
+                        await typeLine('PAGE 2', 'white', 50);
+                        await typeLine('your identification photograph remains valid.', 'white', 50);
+                        await typeLine('do not compare it with previous editions.', 'white', 50);
+                        putLine('');
+                        await typeLine('PAGE 3', 'white', 50);
+                        await typeLine('during a memory incident, remain where you are.', 'white', 50);
+                        await typeLine('someone will remember where to find you.', 'white', 50);
+                        putLine('');
+                        await typeLine(rnd() < 0.04 ? 'PAGE 6' : 'PAGE 5', 'white', 50);
+                        await typeLine('welcome back.', 'white', 50);
                         putLine('');
                         await sleep(1300);
-                        await typeLine('page 4 intentionally omitted.', 'dim', 25);
+                        await typeLine('page 4 unavailable.', 'dim', 25);
                         await sleep(700);
-                        await typeLine('do not request a replacement.', 'dim', 25);
+                        await typeLine('replacement copies are not issued.', 'dim', 25);
                 },
 
                 'directory': async () => {
                         await header('INTERNAL DIRECTORY');
-                        await typeLine('UO DEPARTMENTS - 47 LISTED', 'green', 60);
+                        await typeLine('UNKNOWN ORGANISATION', 'green', 60);
                         putLine('');
-                        await typeLine('  PHYSICAL CONTAINMENT', 'white', 60);
-                        await typeLine('  MEMETICS', 'white', 60);
-                        await typeLine('  NOOSPHERICS', 'white', 60);
-                        await typeLine('  ARCHIVES (BLACK RIVER)', 'white', 60);
-                        await typeLine('  HEAVY ENGINEERING', 'white', 60);
-                        await typeLine('  PHARMACOLOGY', 'white', 60);
-                        await typeLine('  ██████████████ DIVISION', 'white', 60);
-                        await typeLine('  PAYROLL', 'white', 60);
-                        await typeLine('  MAINTENANCE', 'white', 60);
-                        await typeLine('  (' + (rnd() < 0.04 ? 39 : 38) + ' more)', 'dim', 60);
+                        await typeLine('DEPARTMENT DIRECTORY', 'green', 60);
+                        putLine('');
+                        await typeLine('PHYSICAL CONTAINMENT', 'white', 60);
+                        putLine('');
+                        await typeLine('MEMETICS', 'white', 60);
+                        putLine('');
+                        await typeLine('NOOSPHERICS', 'white', 60);
+                        putLine('');
+                        await typeLine('ARCHIVES', 'white', 60);
+                        putLine('');
+                        await typeLine('HEAVY ENGINEERING', 'white', 60);
+                        putLine('');
+                        await typeLine('PHARMACOLOGY', 'white', 60);
+                        putLine('');
+                        await typeLine('██████████████ DIVISION', 'white', 60);
+                        putLine('');
+                        await typeLine('PAYROLL', 'white', 60);
+                        putLine('');
+                        await typeLine('MAINTENANCE', 'white', 60);
+                        putLine('');
+                        await typeLine('(' + (rnd() < 0.04 ? 39 : 38) + ' MORE)', 'dim', 60);
                         putLine('');
                         await sleep(1100);
-                        await typeLine('one entry could not be rendered. this is normal.', 'dim', 25);
+                        await typeLine('directory verification complete.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('one department could not be rendered.', 'dim', 25);
+                        await sleep(700);
+                        await typeLine('no action required.', 'dim', 25);
                 },
 
                 'verify': async () => {
