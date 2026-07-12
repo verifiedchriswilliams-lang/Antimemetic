@@ -112,12 +112,92 @@
                 caretColor: 'transparent', fontSize: '16px', pointerEvents: 'none',
           });
           document.body.appendChild(mobileInput);
-          document.addEventListener('click', () => mobileInput.focus());
 
           const sleep = ms => new Promise(r => setTimeout(r, ms));
 
           function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
           function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+          let audioCtx = null;
+          let humLevelNode = null, whineLevelNode = null;
+          let muted = lsGet('uo_muted') === '1';
+          const HUM_LEVEL = 0.005;
+          const WHINE_LEVEL = 0.0012;
+
+          function buildAudioGraph() {
+                try {
+                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) { return false; }
+                const humOsc = audioCtx.createOscillator();
+                humOsc.type = 'sawtooth';
+                humOsc.frequency.value = 60;
+                const humFilter = audioCtx.createBiquadFilter();
+                humFilter.type = 'lowpass';
+                humFilter.frequency.value = 180;
+                humLevelNode = audioCtx.createGain();
+                humLevelNode.gain.value = 0;
+                humOsc.connect(humFilter).connect(humLevelNode).connect(audioCtx.destination);
+                humOsc.start();
+
+                const whineOsc = audioCtx.createOscillator();
+                whineOsc.type = 'sine';
+                whineOsc.frequency.value = 15500;
+                whineLevelNode = audioCtx.createGain();
+                whineLevelNode.gain.value = 0;
+                whineOsc.connect(whineLevelNode).connect(audioCtx.destination);
+                whineOsc.start();
+                return true;
+          }
+
+          function fadeHum(target, seconds) {
+                if (!audioCtx) return;
+                const now = audioCtx.currentTime;
+                humLevelNode.gain.cancelScheduledValues(now);
+                humLevelNode.gain.setValueAtTime(humLevelNode.gain.value, now);
+                humLevelNode.gain.linearRampToValueAtTime(target, now + seconds);
+                whineLevelNode.gain.cancelScheduledValues(now);
+                whineLevelNode.gain.setValueAtTime(whineLevelNode.gain.value, now);
+                whineLevelNode.gain.linearRampToValueAtTime(target === 0 ? 0 : WHINE_LEVEL, now + seconds);
+          }
+
+          function playInterferenceClick() {
+                const now = audioCtx.currentTime;
+                const bufferSize = Math.floor(audioCtx.sampleRate * 0.04);
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = rnd() * 2 - 1;
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const clickFilter = audioCtx.createBiquadFilter();
+                clickFilter.type = 'bandpass';
+                clickFilter.frequency.value = 1200;
+                const clickGain = audioCtx.createGain();
+                clickGain.gain.setValueAtTime(0.02, now);
+                clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+                noise.connect(clickFilter).connect(clickGain).connect(audioCtx.destination);
+                noise.start(now);
+                noise.stop(now + 0.05);
+          }
+
+          function scheduleInterference() {
+                const delay = 240000 + rnd() * 120000;
+                setTimeout(() => {
+                        if (!muted && audioCtx) playInterferenceClick();
+                        scheduleInterference();
+                }, delay);
+          }
+
+          function ensureAudio() {
+                if (muted) return;
+                if (!audioCtx) {
+                        if (!buildAudioGraph()) return;
+                        scheduleInterference();
+                }
+                fadeHum(HUM_LEVEL, 2);
+          }
+
+          document.addEventListener('click', () => { mobileInput.focus(); ensureAudio(); });
+          document.addEventListener('keydown', ensureAudio, { once: true });
 
           const drift = {
                 flickerConnect: rnd() < (1 / 15),
@@ -747,9 +827,11 @@
                         const g = await typeLine('IT IS ALREADY HERE. IT WAS ALWAYS ALREADY HERE.', 'red', 30);
                         g.classList.add('glitch');
                         await sleep(1800);
+                        fadeHum(0, 0.15);
                         clearScreen();
                         lsSet('uo_read3125', '1');
                         await sleep(2500);
+                        fadeHum(HUM_LEVEL, 0.4);
                         sessionStorage.removeItem('override3125');
                         await typeLine('what were you reading?', 'dim', 22);
                         putLine('');
@@ -1484,6 +1566,19 @@
                 'clear': async () => {
                         clearScreen();
                         newPromptLine();
+                },
+
+                'mute': async () => {
+                        muted = !muted;
+                        lsSet('uo_muted', muted ? '1' : '0');
+                        await sleep(600);
+                        if (muted) {
+                                fadeHum(0, 0.3);
+                                await typeLine('silence noted.', 'dim', 25);
+                        } else {
+                                await typeLine('the hum returns.', 'dim', 25);
+                                ensureAudio();
+                        }
                 },
 
                 'qntm': async () => {
