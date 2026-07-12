@@ -98,6 +98,22 @@
           screen.id = 'screen';
           document.body.appendChild(screen);
 
+          const mobileInput = document.createElement('input');
+          mobileInput.type = 'text';
+          mobileInput.setAttribute('aria-label', 'terminal input');
+          mobileInput.autocomplete = 'off';
+          mobileInput.autocapitalize = 'off';
+          mobileInput.setAttribute('autocorrect', 'off');
+          mobileInput.spellcheck = false;
+          Object.assign(mobileInput.style, {
+                position: 'fixed', top: '0', left: '0',
+                width: '1px', height: '1px', padding: '0', border: 'none',
+                opacity: '0', background: 'transparent', color: 'transparent',
+                caretColor: 'transparent', fontSize: '16px', pointerEvents: 'none',
+          });
+          document.body.appendChild(mobileInput);
+          document.addEventListener('click', () => mobileInput.focus());
+
           const sleep = ms => new Promise(r => setTimeout(r, ms));
 
           function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
