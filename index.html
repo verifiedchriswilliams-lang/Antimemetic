@@ -121,8 +121,8 @@
           let audioCtx = null;
           let humLevelNode = null, whineLevelNode = null;
           let muted = lsGet('uo_muted') === '1';
-          const HUM_LEVEL = 0.005;
-          const WHINE_LEVEL = 0.0012;
+          const HUM_LEVEL = 0.022;
+          const WHINE_LEVEL = 0.0025;
 
           function buildAudioGraph() {
                 try {
@@ -133,7 +133,7 @@
                 humOsc.frequency.value = 60;
                 const humFilter = audioCtx.createBiquadFilter();
                 humFilter.type = 'lowpass';
-                humFilter.frequency.value = 180;
+                humFilter.frequency.value = 500;
                 humLevelNode = audioCtx.createGain();
                 humLevelNode.gain.value = 0;
                 humOsc.connect(humFilter).connect(humLevelNode).connect(audioCtx.destination);
