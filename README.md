@@ -10,7 +10,7 @@ You are not looking at it. This page contains zero (0) files. The commit history
 
 ## Access
 
-Authorized field personnel may consult the terminal at [thereisnoantimemeticsdivision.com](https://thereisnoantimemeticsdivision.com). No index is provided. You already know the numbers.
+Authorised field personnel may consult the terminal at [thereisnoantimemeticsdivision.com](https://thereisnoantimemeticsdivision.com). No index is provided. You already know the numbers.
 
 If you have arrived here by accident, close this tab. You will forget it anyway.
 
