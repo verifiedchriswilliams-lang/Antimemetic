@@ -5,3 +5,4 @@ Disallow: /forget/
 Disallow: /b30-000/
 
 Sitemap:
+Sitemap: https://thereisnoantimemeticsdivision.com/sitemap.xml
