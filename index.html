@@ -94,9 +94,14 @@
             width: 9px; height: 18px;
             background: #b8b8b8;
             vertical-align: text-bottom;
-            animation: blink 1.06s steps(1) infinite;
+            animation: blink 3.5s steps(1) infinite;
       }
-      @keyframes blink { 50% { background: transparent; } }
+      @keyframes blink {
+            0%   { background: #b8b8b8; }
+            16%  { background: transparent; }
+            32%  { background: #b8b8b8; }
+            48%  { background: transparent; }
+      }
 
       .glitch { animation: glitchShake 0.08s infinite; }
       @keyframes glitchShake {
