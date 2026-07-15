@@ -424,6 +424,20 @@
                         setTimeout(() => { document.title = originalTitle; }, 500);
                 }
 
+                if (rnd() < 0.04) {
+                        const nfd = span('', 'dim');
+                        screen.appendChild(nfd);
+                        for (const ch of 'this is not your first day.') {
+                                nfd.textContent += ch; scrollBottom(); await sleep(25);
+                        }
+                        await sleep(1200);
+                        while (nfd.textContent.length) {
+                                nfd.textContent = nfd.textContent.slice(0, -1);
+                                await sleep(15);
+                        }
+                        nfd.remove();
+                }
+
                 startTerminal();
           }
 
@@ -905,6 +919,7 @@
                         await sleep(900);
                         await typeLine('Do not disturb it.', 'dim', 28);
                 },
+                'sunshine': async () => handlers['4987'](),
 
                 '7175': async () => {
                         markFile('U-7175');
@@ -1296,6 +1311,21 @@
                 },
                 'black river': async () => handlers['blackriver'](),
 
+                'vault 3011a': async () => {
+                        await header('FACILITY RECORD - VAULT 3011A');
+                        await typeLine('CONTENTS:', 'white', 45);
+                        await typeLine('U-2256 (Cryptomorpha gigantes). NEUTRALISED.', 'white', 45);
+                        putLine('');
+                        await typeLine('recorded dimensions of the vault do not account', 'white', 40);
+                        await typeLine('for the recorded dimensions of the occupant.', 'white', 40);
+                        putLine('');
+                        await sleep(1200);
+                        await typeLine('nobody who has toured this vault remembers it', 'dim', 25);
+                        await typeLine('being unusual.', 'dim', 25);
+                },
+                '3011a': async () => handlers['vault 3011a'](),
+                'vault3011a': async () => handlers['vault 3011a'](),
+
                 'incident': async () => {
                         await header('INCIDENT REGISTER');
                         await typeLine((rnd() < 0.04 ? 119 : 118) + ' REPORTS AVAILABLE.', 'white', 45);
@@ -1444,6 +1474,8 @@
                         await typeLine('page 4 unavailable.', 'dim', 25);
                         await sleep(700);
                         await typeLine('replacement copies are not issued.', 'dim', 25);
+                        await sleep(900);
+                        await typeLine('this is not your first day.', 'dim', 25);
                 },
 
                 'directory': async () => {
