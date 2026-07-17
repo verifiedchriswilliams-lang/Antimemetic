@@ -725,6 +725,13 @@
                         await typeLine('further descriptive revisions require prior approval.', 'dim', 30);
                         await sleep(700);
                         await typeLine('repeated revisions have not improved the record.', 'dim', 30);
+                        putLine('');
+                        await sleep(900);
+                        await typeLine('Revision 11', 'dim', 25);
+                        putLine('');
+                        await typeLine('Terminology updated to reflect current guidance.', 'dim', 25);
+                        putLine('');
+                        await typeLine('No operational changes.', 'dim', 25);
                 },
 
                 '2200': async () => {
@@ -918,6 +925,14 @@
                         await typeLine('No discrepancies recorded.', 'dim', 28);
                         await sleep(900);
                         await typeLine('Do not disturb it.', 'dim', 28);
+                        putLine('');
+                        await sleep(900);
+                        await typeLine('Revision 7', 'dim', 25);
+                        putLine('');
+                        await typeLine('Access phrasing updated to reflect current', 'dim', 25);
+                        await typeLine('guidance.', 'dim', 25);
+                        putLine('');
+                        await typeLine('No operational changes.', 'dim', 25);
                 },
                 'sunshine': async () => handlers['4987'](),
 
@@ -1235,6 +1250,22 @@
                         await typeLine('the redaction predates this file.', 'dim', 25);
                         await sleep(700);
                         await typeLine('nobody currently employed placed it there.', 'dim', 25);
+                },
+
+                '1844': async () => {
+                        markFile('U-1844');
+                        await header('FILE U-1844');
+                        await typeLine('ITEM #: U-1844', 'green', 80);
+                        await typeLine('CLASS: [UNKNOWN]', 'green', 80);
+                        putLine('');
+                        await typeLine('LOCATION:', 'white', 55);
+                        await typeLine('Unknown.', 'white', 55);
+                        putLine('');
+                        await typeLine('DESCRIPTION:', 'white', 55);
+                        putLine('');
+                        await typeLine('Recovered once.', 'white', 55);
+                        putLine('');
+                        await typeLine('Lost again.', 'white', 55);
                 },
 
                 '55555': async () => {
@@ -1637,6 +1668,13 @@
                         await sleep(800);
                         await typeLine('requests for clarification should be submitted', 'dim', 45);
                         await typeLine('through the usual channels.', 'dim', 45);
+                        putLine('');
+                        await sleep(900);
+                        await typeLine('Revision 4', 'dim', 25);
+                        putLine('');
+                        await typeLine('Level definitions reformatted for clarity.', 'dim', 25);
+                        putLine('');
+                        await typeLine('No operational changes.', 'dim', 25);
                 },
 
                 'orientation': async () => {
